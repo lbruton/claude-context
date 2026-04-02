@@ -37,33 +37,71 @@ export class ToolHandlers {
 
             // Build set of codebases that exist in the vector DB
             const vectorDbCodebases = new Set<string>();
+            let codeCollectionsChecked = 0;
+            let extractionFailures = 0;
+
             for (const collectionName of collections) {
                 if (!collectionName.startsWith('code_chunks_') && !collectionName.startsWith('hybrid_code_chunks_')) {
                     continue;
                 }
+                codeCollectionsChecked++;
+
                 try {
+                    // Try description-based extraction first (new format)
                     const description = await vectorDb.getCollectionDescription(collectionName);
                     if (description && description.startsWith('codebasePath:')) {
                         const codebasePath = description.substring('codebasePath:'.length);
                         if (codebasePath.length > 0) {
                             vectorDbCodebases.add(codebasePath);
+                            continue;
                         }
                     }
-                } catch (descError: any) {
-                    console.warn(`[SNAPSHOT-SYNC] Failed to get description for ${collectionName}:`, descError.message || descError);
+
+                    // Fallback: query chunk metadata for legacy collections without description
+                    const results = await vectorDb.query(
+                        collectionName,
+                        undefined as any,
+                        ['metadata'],
+                        1
+                    );
+                    if (results && results.length > 0 && results[0].metadata) {
+                        const metadata = JSON.parse(results[0].metadata);
+                        if (metadata.codebasePath && typeof metadata.codebasePath === 'string') {
+                            vectorDbCodebases.add(metadata.codebasePath);
+                            continue;
+                        }
+                    }
+                } catch (error: any) {
+                    extractionFailures++;
+                    console.warn(`[SNAPSHOT-SYNC] Failed to extract path for ${collectionName}:`, error.message || error);
                 }
+            }
+
+            // Safety guard: if all extractions failed, skip reconciliation to avoid
+            // deleting valid snapshot entries due to transient Milvus errors
+            if (codeCollectionsChecked > 0 && vectorDbCodebases.size === 0 && extractionFailures > 0) {
+                console.warn(`[SNAPSHOT-SYNC] All ${codeCollectionsChecked} extractions failed. Skipping reconciliation to avoid data loss.`);
+                return;
             }
 
             // Reconcile snapshot with vector DB
             const localCodebases = new Set(this.snapshotManager.getIndexedCodebases());
             let hasChanges = false;
 
+            // Only delete snapshot entries if extraction was fully successful —
+            // partial failures could cause false deletions for unrelated codebases
+            const canSafelyDelete = extractionFailures === 0;
+
             // Clear snapshot entries whose collections no longer exist
             for (const localCodebase of localCodebases) {
                 if (!vectorDbCodebases.has(localCodebase)) {
-                    this.snapshotManager.removeCodebaseCompletely(localCodebase);
-                    hasChanges = true;
-                    console.log(`[SNAPSHOT-SYNC] Cleared stale snapshot entry: ${localCodebase}`);
+                    if (canSafelyDelete) {
+                        this.snapshotManager.removeCodebaseCompletely(localCodebase);
+                        hasChanges = true;
+                        console.log(`[SNAPSHOT-SYNC] Cleared stale snapshot entry: ${localCodebase}`);
+                    } else {
+                        console.log(`[SNAPSHOT-SYNC] Skipping deletion of ${localCodebase} — ${extractionFailures} extraction(s) failed`);
+                    }
                 }
             }
 
