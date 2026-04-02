@@ -28,7 +28,7 @@ export class ToolHandlers {
             const vectorDb = this.context.getVectorDatabase();
             const collections = await vectorDb.listCollections();
 
-            console.log(`[SNAPSHOT-SYNC] Found ${collections.length} collections in vector DB`);
+            console.log(`[SNAPSHOT-SYNC] Found ${collections.length} vector DB collections`);
 
             if (collections.length === 0) {
                 console.log(`[SNAPSHOT-SYNC] No collections found in vector DB. Skipping snapshot cleanup to avoid data loss from transient errors.`);
@@ -71,16 +71,22 @@ export class ToolHandlers {
                             continue;
                         }
                     }
+
+                    // Neither method yielded a path — count as a failure so the
+                    // safety guard below protects against silent empty returns
+                    extractionFailures++;
+                    console.warn(`[SNAPSHOT-SYNC] No codebase path found for ${collectionName} (empty description and metadata)`);
                 } catch (error: any) {
                     extractionFailures++;
                     console.warn(`[SNAPSHOT-SYNC] Failed to extract path for ${collectionName}:`, error.message || error);
                 }
             }
 
-            // Safety guard: if all extractions failed, skip reconciliation to avoid
-            // deleting valid snapshot entries due to transient Milvus errors
-            if (codeCollectionsChecked > 0 && vectorDbCodebases.size === 0 && extractionFailures > 0) {
-                console.warn(`[SNAPSHOT-SYNC] All ${codeCollectionsChecked} extractions failed. Skipping reconciliation to avoid data loss.`);
+            // Safety guard: if we couldn't resolve ANY collection to a codebase
+            // path (errors or empty returns), skip reconciliation entirely to
+            // avoid deleting valid snapshot entries
+            if (codeCollectionsChecked > 0 && vectorDbCodebases.size === 0) {
+                console.warn(`[SNAPSHOT-SYNC] Could not resolve any of ${codeCollectionsChecked} collections to codebase paths (${extractionFailures} failures). Skipping reconciliation to avoid data loss.`);
                 return;
             }
 
@@ -122,7 +128,8 @@ export class ToolHandlers {
                 this.snapshotManager.saveCodebaseSnapshot();
             }
 
-            console.log(`[SNAPSHOT-SYNC] Validation complete (${vectorDbCodebases.size} collections, ${localCodebases.size} snapshot entries)`);
+            const finalSnapshotCount = this.snapshotManager.getIndexedCodebases().length;
+            console.log(`[SNAPSHOT-SYNC] Validation complete (${vectorDbCodebases.size} codebases in DB, ${finalSnapshotCount} snapshot entries)`);
         } catch (error: any) {
             console.error(`[SNAPSHOT-SYNC] Error validating snapshot consistency:`, error.message || error);
             // Non-fatal — per-path validation in handlers catches individual mismatches
