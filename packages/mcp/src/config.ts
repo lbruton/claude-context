@@ -68,7 +68,7 @@ export interface CodebaseSnapshotV2 {
 export type CodebaseSnapshot = CodebaseSnapshotV1 | CodebaseSnapshotV2;
 
 // Helper function to get default model for each provider
-export function getDefaultModelForProvider(provider: string): string {
+function getDefaultModelForProvider(provider: string): string {
     switch (provider) {
         case 'OpenAI':
             return 'text-embedding-3-small';
@@ -84,35 +84,20 @@ export function getDefaultModelForProvider(provider: string): string {
 }
 
 // Helper function to get embedding model with provider-specific environment variable priority
-export function getEmbeddingModelForProvider(provider: string): string {
+function getEmbeddingModelForProvider(provider: string): string {
     switch (provider) {
         case 'Ollama':
             // For Ollama, prioritize OLLAMA_MODEL over EMBEDDING_MODEL for backward compatibility
-            const ollamaModel = envManager.get('OLLAMA_MODEL') || envManager.get('EMBEDDING_MODEL') || getDefaultModelForProvider(provider);
-            console.log(`[DEBUG] 🎯 Ollama model selection: OLLAMA_MODEL=${envManager.get('OLLAMA_MODEL') || 'NOT SET'}, EMBEDDING_MODEL=${envManager.get('EMBEDDING_MODEL') || 'NOT SET'}, selected=${ollamaModel}`);
-            return ollamaModel;
+            return envManager.get('OLLAMA_MODEL') || envManager.get('EMBEDDING_MODEL') || getDefaultModelForProvider(provider);
         case 'OpenAI':
         case 'VoyageAI':
         case 'Gemini':
         default:
-            // For all other providers, use EMBEDDING_MODEL or default
-            const selectedModel = envManager.get('EMBEDDING_MODEL') || getDefaultModelForProvider(provider);
-            console.log(`[DEBUG] 🎯 ${provider} model selection: EMBEDDING_MODEL=${envManager.get('EMBEDDING_MODEL') || 'NOT SET'}, selected=${selectedModel}`);
-            return selectedModel;
+            return envManager.get('EMBEDDING_MODEL') || getDefaultModelForProvider(provider);
     }
 }
 
 export function createMcpConfig(): ContextMcpConfig {
-    // Debug: Print all environment variables related to Context
-    console.log(`[DEBUG] 🔍 Environment Variables Debug:`);
-    console.log(`[DEBUG]   EMBEDDING_PROVIDER: ${envManager.get('EMBEDDING_PROVIDER') || 'NOT SET'}`);
-    console.log(`[DEBUG]   EMBEDDING_MODEL: ${envManager.get('EMBEDDING_MODEL') || 'NOT SET'}`);
-    console.log(`[DEBUG]   OLLAMA_MODEL: ${envManager.get('OLLAMA_MODEL') || 'NOT SET'}`);
-    console.log(`[DEBUG]   GEMINI_API_KEY: ${envManager.get('GEMINI_API_KEY') ? 'SET (length: ' + envManager.get('GEMINI_API_KEY')!.length + ')' : 'NOT SET'}`);
-    console.log(`[DEBUG]   OPENAI_API_KEY: ${envManager.get('OPENAI_API_KEY') ? 'SET (length: ' + envManager.get('OPENAI_API_KEY')!.length + ')' : 'NOT SET'}`);
-    console.log(`[DEBUG]   MILVUS_ADDRESS: ${envManager.get('MILVUS_ADDRESS') || 'NOT SET'}`);
-    console.log(`[DEBUG]   NODE_ENV: ${envManager.get('NODE_ENV') || 'NOT SET'}`);
-
     const config: ContextMcpConfig = {
         name: envManager.get('MCP_SERVER_NAME') || "Context MCP Server",
         version: envManager.get('MCP_SERVER_VERSION') || "1.0.0",

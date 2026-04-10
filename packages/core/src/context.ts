@@ -260,7 +260,6 @@ export class Context {
 
         // 2. Check and prepare vector collection
         progressCallback?.({ phase: 'Preparing collection...', current: 0, total: 100, percentage: 0 });
-        console.log(`Debug2: Preparing vector collection for codebase${forceReindex ? ' (FORCE REINDEX)' : ''}`);
         await this.prepareCollection(codebasePath, forceReindex);
 
         // 3. Recursively traverse codebase to get all supported files
@@ -933,7 +932,7 @@ export class Context {
             return content
                 .split('\n')
                 .map(line => line.trim())
-                .filter(line => line && !line.startsWith('#')); // Filter out empty lines and comments
+                .filter(line => line && !line.startsWith('#') && !line.startsWith('!')); // Filter out empty lines, comments, and negations
         } catch (error) {
             console.warn(`[Context] ⚠️  Could not read ignore file ${filePath}: ${error}`);
             return [];
@@ -979,14 +978,17 @@ export class Context {
      * @returns Array of ignore file paths
      */
     private async findIgnoreFiles(codebasePath: string): Promise<string[]> {
+        // Only load .gitignore and .contextignore — NOT .dockerignore, .npmignore, etc.
+        // Docker/npm ignore files contain tool-specific patterns (e.g. *.md) that are
+        // not meant for code indexing and cause false positives when accumulated across repos.
+        const ALLOWED_IGNORE_FILES = new Set(['.gitignore', '.contextignore']);
+
         try {
             const entries = await fs.promises.readdir(codebasePath, { withFileTypes: true });
             const ignoreFiles: string[] = [];
 
             for (const entry of entries) {
-                if (entry.isFile() &&
-                    entry.name.startsWith('.') &&
-                    entry.name.endsWith('ignore')) {
+                if (entry.isFile() && ALLOWED_IGNORE_FILES.has(entry.name)) {
                     ignoreFiles.push(path.join(codebasePath, entry.name));
                 }
             }
