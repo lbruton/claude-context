@@ -6,31 +6,42 @@
 
 ## Why this fork?
 
-The upstream `@zilliz/claude-context-mcp` is built for Zilliz Cloud. When used with self-hosted Milvus, it has several issues:
+The upstream `@zilliz/claude-context-mcp` targets Zilliz Cloud. When used with self-hosted Milvus it has several issues:
 
-- **No fetch timeout** on REST API calls — hangs indefinitely on `DEADLINE_EXCEEDED`
-- **No gRPC connection timeout** — `MilvusClient` connects without a timeout, causing session startup failures
-- **No error differentiation** — transient vs permanent failures are treated identically
-- **Carries unused packages** — chrome extension, VS Code extension, and Python evaluation suite add attack surface without value for MCP-only deployments
+- **No fetch/gRPC timeout** — hangs indefinitely on `DEADLINE_EXCEEDED`
+- **Zilliz Cloud fallback** — silently falls back to cloud on any connection error, masking local Milvus failures
+- **No retry logic** — a single transient failure aborts the entire indexing run
+- **No error differentiation** — timeout vs auth vs connection failure all look the same
+- **Carries unused packages** — chrome extension, VS Code extension, and evaluation suite add attack surface without value for MCP-only deployments
+- **Ignore file accumulation** — `.dockerignore`, `.npmignore` etc. loaded alongside `.gitignore`, causing patterns like `*.md` to bleed across repos indexed in the same session
 
-This fork strips it down to the essentials (core + MCP server), patches vulnerabilities, and publishes to `@lbruton/claude-context-mcp` on npm.
+This fork strips it down to core + MCP server, patches all known issues, and publishes to `@lbruton/` on npm.
 
 ## Changes from upstream
 
-### Stability fixes
-1. **30s fetch timeout** on all REST API requests (`AbortSignal.timeout`)
-2. **30s gRPC connection timeout** on `MilvusClient` initialization
-3. **Better error logging** — timeout vs error differentiated in log output
+### Reliability (CC-1)
+1. **Removed Zilliz Cloud fallback** — failed Milvus connections surface as errors immediately, no silent cloud redirect
+2. **Retry with exponential backoff** — transient `DEADLINE_EXCEEDED` and connection errors retry automatically before failing
+3. **Health check on startup** — Milvus connectivity verified at server init with a clear error if unreachable
+4. **30s fetch + gRPC timeouts** — no more indefinite hangs on REST or gRPC calls
+5. **Hardened snapshot validation** — safety guards prevent corrupted state files from breaking subsequent runs
 
-### Security hardening (0.1.8)
-4. **Removed unused packages** — chrome extension, VS Code extension, and `evaluation/` benchmark suite eliminated along with their vulnerable dependency trees
-5. **Patched all dependencies** — 67 audit vulnerabilities resolved (0 remaining)
-6. **pnpm overrides** for transitive deps pinned by upstream packages (`@langchain/core`, `langsmith`, `qs`)
-7. **Codacy SCA/SAST clean** — `.codacy.yml` configured, false positives suppressed
+### Indexing correctness (CC-2 — v0.1.13)
+6. **Allowlist for ignore files** — only `.gitignore` and `.contextignore` are loaded; `.dockerignore`, `.npmignore`, and other tool-specific files are excluded. Prevents patterns like `*.md` from a Docker ignore file bleeding into unrelated repos indexed in the same session.
+7. **Negation line filtering** — `!`-prefixed lines in `.gitignore` are stripped rather than passed as positive rules to the glob engine, preventing false exclusions.
+
+### Cleaner MCP startup (CC-3 — v0.1.13)
+8. **Removed debug logs** — `[DEBUG]` lines that dumped environment variable names (including API key presence) to stderr on every startup have been removed from `config.ts`.
+
+### Security hardening (v0.1.8)
+9. **Removed unused packages** — chrome extension, VS Code extension, and `evaluation/` benchmark suite eliminated along with their vulnerable dependency trees
+10. **Patched all dependencies** — 67 audit vulnerabilities resolved (0 remaining)
+11. **pnpm overrides** for transitive deps pinned by upstream packages
+12. **Codacy SCA/SAST clean** — `.codacy.yml` configured, false positives suppressed
 
 ### Scope
-8. **Rebranded to `@lbruton/` npm scope** — `@lbruton/claude-context-core` + `@lbruton/claude-context-mcp`
-9. **Lean monorepo** — only `packages/core` and `packages/mcp` remain in the workspace
+13. **Rebranded to `@lbruton/` npm scope** — `@lbruton/claude-context-core` + `@lbruton/claude-context-mcp`
+14. **Lean monorepo** — only `packages/core` and `packages/mcp` remain in the workspace
 
 ## Installation (Claude Code MCP)
 
@@ -58,24 +69,38 @@ In `~/.claude/.mcp.json`:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `MILVUS_ADDRESS` | Yes | Milvus gRPC endpoint (e.g., `localhost:19530`) |
-| `OPENAI_API_KEY` | Yes* | OpenAI API key for embeddings |
+| `MILVUS_ADDRESS` | Yes | Milvus gRPC endpoint — bare `host:port` (e.g., `192.168.1.81:19530`) |
+| `OPENAI_API_KEY` | Yes* | API key for OpenAI embeddings |
 | `EMBEDDING_PROVIDER` | No | `OpenAI` (default), `VoyageAI`, `Gemini`, `Ollama` |
 | `EMBEDDING_MODEL` | No | Model name (default: `text-embedding-3-small`) |
-| `MILVUS_TOKEN` | No | Zilliz Cloud token (not needed for local Milvus) |
+| `MILVUS_TOKEN` | No | Authentication token for Milvus (if auth enabled) |
+| `VOYAGEAI_API_KEY` | No | Required when `EMBEDDING_PROVIDER=VoyageAI` |
+| `GEMINI_API_KEY` | No | Required when `EMBEDDING_PROVIDER=Gemini` |
+| `OLLAMA_HOST` | No | Ollama server host (default: `http://127.0.0.1:11434`) |
+| `OLLAMA_MODEL` | No | Ollama model name (alternative to `EMBEDDING_MODEL` for Ollama) |
 
 *Required when using OpenAI embeddings (default).
 
-## Local Milvus Setup
+## Custom ignore patterns
+
+By default only `.gitignore` and `.contextignore` are loaded. To exclude files or directories from indexing without modifying your `.gitignore`, add a `.contextignore` file at the root of the codebase:
+
+```
+# .contextignore
+dist/
+*.generated.ts
+secrets/
+```
+
+## Local Milvus setup
 
 This fork is designed for local Milvus Standalone. Run Milvus via Docker:
 
 ```bash
-# Milvus Standalone (includes etcd + minio)
 docker compose -f docker-compose-milvus.yml up -d
 ```
 
-Or use an existing Milvus instance on your network — just set `MILVUS_ADDRESS` to point to it.
+Or point `MILVUS_ADDRESS` at an existing Milvus instance on your network.
 
 ## Building from source
 
