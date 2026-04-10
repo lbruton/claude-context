@@ -973,7 +973,11 @@ export class Context {
     }
 
     /**
-     * Find all .xxxignore files in the codebase directory
+     * Find ignore files in the codebase directory.
+     * Only loads .gitignore and .contextignore — .dockerignore, .npmignore, and
+     * other tool-specific ignore files are excluded because they contain patterns
+     * (e.g. *.md) that are not meant for code indexing and accumulate incorrectly
+     * across repos indexed in the same session.
      * @param codebasePath Path to the codebase
      * @returns Array of ignore file paths
      */
