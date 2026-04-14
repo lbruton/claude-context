@@ -12,6 +12,15 @@ Key fork changes: 30s fetch/gRPC timeouts, better error differentiation, rebrand
 **Issue prefix:** None (tracked via OPS- issues in DevOps).
 **Branch:** `master` (not main).
 
+## Repository Identity (Important)
+
+This repository started as a fork of `zilliztech/claude-context`, but it is now maintained as an independent project.
+
+- `origin` is the source of truth for all PR work: `lbruton/claude-context`
+- `upstream` may still exist as a remote for occasional reference/contribution history
+- Do not treat upstream PRs/issues as actionable for this repo unless explicitly requested
+- For PR operations (especially `/pr-resolve`), always scope GitHub commands to `-R lbruton/claude-context`
+
 ## Build & Dev Commands
 
 ```bash
