@@ -1,2 +1,1 @@
-pnpm exec lint-staged
-pre-commit run
+pnpm exec lint-staged && pre-commit run
