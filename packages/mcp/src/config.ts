@@ -1,4 +1,4 @@
-import { envManager } from "@lbruton/claude-context-core";
+import { envManager } from '@lbruton/claude-context-core';
 
 export interface ContextMcpConfig {
     name: string;
@@ -23,7 +23,7 @@ export interface ContextMcpConfig {
 // Legacy format (v1) - for backward compatibility
 export interface CodebaseSnapshotV1 {
     indexedCodebases: string[];
-    indexingCodebases: string[] | Record<string, number>;  // Array (legacy) or Map of codebase path to progress percentage
+    indexingCodebases: string[] | Record<string, number>; // Array (legacy) or Map of codebase path to progress percentage
     lastUpdated: string;
 }
 
@@ -37,22 +37,22 @@ interface CodebaseInfoBase {
 // Indexing state - when indexing is in progress
 export interface CodebaseInfoIndexing extends CodebaseInfoBase {
     status: 'indexing';
-    indexingPercentage: number;  // Current progress percentage
+    indexingPercentage: number; // Current progress percentage
 }
 
 // Indexed state - when indexing completed successfully
 export interface CodebaseInfoIndexed extends CodebaseInfoBase {
     status: 'indexed';
-    indexedFiles: number;        // Number of files indexed
-    totalChunks: number;         // Total number of chunks generated
-    indexStatus: 'completed' | 'limit_reached';  // Status from indexing result
+    indexedFiles: number; // Number of files indexed
+    totalChunks: number; // Total number of chunks generated
+    indexStatus: 'completed' | 'limit_reached'; // Status from indexing result
 }
 
 // Index failed state - when indexing failed
 export interface CodebaseInfoIndexFailed extends CodebaseInfoBase {
     status: 'indexfailed';
-    errorMessage: string;        // Error message from the failure
-    lastAttemptedPercentage?: number;  // Progress when failure occurred
+    errorMessage: string; // Error message from the failure
+    lastAttemptedPercentage?: number; // Progress when failure occurred
 }
 
 // Union type for all codebase information states
@@ -60,7 +60,7 @@ export type CodebaseInfo = CodebaseInfoIndexing | CodebaseInfoIndexed | Codebase
 
 export interface CodebaseSnapshotV2 {
     formatVersion: 'v2';
-    codebases: Record<string, CodebaseInfo>;  // codebasePath -> CodebaseInfo
+    codebases: Record<string, CodebaseInfo>; // codebasePath -> CodebaseInfo
     lastUpdated: string;
 }
 
@@ -88,7 +88,11 @@ function getEmbeddingModelForProvider(provider: string): string {
     switch (provider) {
         case 'Ollama':
             // For Ollama, prioritize OLLAMA_MODEL over EMBEDDING_MODEL for backward compatibility
-            return envManager.get('OLLAMA_MODEL') || envManager.get('EMBEDDING_MODEL') || getDefaultModelForProvider(provider);
+            return (
+                envManager.get('OLLAMA_MODEL') ||
+                envManager.get('EMBEDDING_MODEL') ||
+                getDefaultModelForProvider(provider)
+            );
         case 'OpenAI':
         case 'VoyageAI':
         case 'Gemini':
@@ -99,11 +103,15 @@ function getEmbeddingModelForProvider(provider: string): string {
 
 export function createMcpConfig(): ContextMcpConfig {
     const config: ContextMcpConfig = {
-        name: envManager.get('MCP_SERVER_NAME') || "Context MCP Server",
-        version: envManager.get('MCP_SERVER_VERSION') || "1.0.0",
+        name: envManager.get('MCP_SERVER_NAME') || 'Context MCP Server',
+        version: envManager.get('MCP_SERVER_VERSION') || '1.0.0',
         // Embedding provider configuration
-        embeddingProvider: (envManager.get('EMBEDDING_PROVIDER') as 'OpenAI' | 'VoyageAI' | 'Gemini' | 'Ollama') || 'OpenAI',
-        embeddingModel: getEmbeddingModelForProvider(envManager.get('EMBEDDING_PROVIDER') || 'OpenAI'),
+        embeddingProvider:
+            (envManager.get('EMBEDDING_PROVIDER') as 'OpenAI' | 'VoyageAI' | 'Gemini' | 'Ollama') ||
+            'OpenAI',
+        embeddingModel: getEmbeddingModelForProvider(
+            envManager.get('EMBEDDING_PROVIDER') || 'OpenAI',
+        ),
         // Provider-specific API keys
         openaiApiKey: envManager.get('OPENAI_API_KEY'),
         openaiBaseUrl: envManager.get('OPENAI_BASE_URL'),
@@ -115,7 +123,7 @@ export function createMcpConfig(): ContextMcpConfig {
         ollamaHost: envManager.get('OLLAMA_HOST'),
         // Vector database configuration
         milvusAddress: envManager.get('MILVUS_ADDRESS'),
-        milvusToken: envManager.get('MILVUS_TOKEN')
+        milvusToken: envManager.get('MILVUS_TOKEN'),
     };
 
     return config;
@@ -133,16 +141,22 @@ export function logConfigurationSummary(config: ContextMcpConfig): void {
     // Log provider-specific configuration without exposing sensitive data
     switch (config.embeddingProvider) {
         case 'OpenAI':
-            console.log(`[MCP]   OpenAI API Key: ${config.openaiApiKey ? '✅ Configured' : '❌ Missing'}`);
+            console.log(
+                `[MCP]   OpenAI API Key: ${config.openaiApiKey ? '✅ Configured' : '❌ Missing'}`,
+            );
             if (config.openaiBaseUrl) {
                 console.log(`[MCP]   OpenAI Base URL: ${config.openaiBaseUrl}`);
             }
             break;
         case 'VoyageAI':
-            console.log(`[MCP]   VoyageAI API Key: ${config.voyageaiApiKey ? '✅ Configured' : '❌ Missing'}`);
+            console.log(
+                `[MCP]   VoyageAI API Key: ${config.voyageaiApiKey ? '✅ Configured' : '❌ Missing'}`,
+            );
             break;
         case 'Gemini':
-            console.log(`[MCP]   Gemini API Key: ${config.geminiApiKey ? '✅ Configured' : '❌ Missing'}`);
+            console.log(
+                `[MCP]   Gemini API Key: ${config.geminiApiKey ? '✅ Configured' : '❌ Missing'}`,
+            );
             if (config.geminiBaseUrl) {
                 console.log(`[MCP]   Gemini Base URL: ${config.geminiBaseUrl}`);
             }
@@ -204,4 +218,4 @@ Examples:
   # Start MCP server with Ollama
   EMBEDDING_PROVIDER=Ollama OLLAMA_MODEL=mxbai-embed-large MILVUS_ADDRESS=localhost:19530 npx @lbruton/claude-context-mcp@latest
         `);
-} 
+}

@@ -17,13 +17,14 @@ export class OpenAIEmbedding extends Embedding {
     constructor(config: OpenAIEmbeddingConfig) {
         super();
         this.config = config;
-        this.client = new OpenAI({ // nosemgrep: ai.typescript.detect-openai.detect-openai
+        this.client = new OpenAI({
+            // nosemgrep: ai.typescript.detect-openai.detect-openai
             apiKey: config.apiKey,
             baseURL: config.baseURL,
         });
     }
 
-    async detectDimension(testText: string = "test"): Promise<number> {
+    async detectDimension(testText: string = 'test'): Promise<number> {
         const model = this.config.model || 'text-embedding-3-small';
         const knownModels = OpenAIEmbedding.getSupportedModels();
 
@@ -45,7 +46,11 @@ export class OpenAIEmbedding extends Embedding {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
             // Re-throw authentication errors
-            if (errorMessage.includes('API key') || errorMessage.includes('unauthorized') || errorMessage.includes('authentication')) {
+            if (
+                errorMessage.includes('API key') ||
+                errorMessage.includes('unauthorized') ||
+                errorMessage.includes('authentication')
+            ) {
                 throw new Error(`Failed to detect dimension for model ${model}: ${errorMessage}`);
             }
 
@@ -77,7 +82,7 @@ export class OpenAIEmbedding extends Embedding {
 
             return {
                 vector: response.data[0].embedding,
-                dimension: this.dimension
+                dimension: this.dimension,
             };
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -107,7 +112,7 @@ export class OpenAIEmbedding extends Embedding {
 
             return response.data.map((item) => ({
                 vector: item.embedding,
-                dimension: this.dimension
+                dimension: this.dimension,
             }));
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -127,7 +132,9 @@ export class OpenAIEmbedding extends Embedding {
 
         // For custom models, return the current dimension
         // Note: This may be incorrect until detectDimension() is called
-        console.warn(`[OpenAIEmbedding] ⚠️ getDimension() called for custom model '${model}' - returning ${this.dimension}. Call detectDimension() first for accurate dimension.`);
+        console.warn(
+            `[OpenAIEmbedding] ⚠️ getDimension() called for custom model '${model}' - returning ${this.dimension}. Call detectDimension() first for accurate dimension.`,
+        );
         return this.dimension;
     }
 
@@ -163,16 +170,16 @@ export class OpenAIEmbedding extends Embedding {
         return {
             'text-embedding-3-small': {
                 dimension: 1536,
-                description: 'High performance and cost-effective embedding model (recommended)'
+                description: 'High performance and cost-effective embedding model (recommended)',
             },
             'text-embedding-3-large': {
                 dimension: 3072,
-                description: 'Highest performance embedding model with larger dimensions'
+                description: 'Highest performance embedding model with larger dimensions',
             },
             'text-embedding-ada-002': {
                 dimension: 1536,
-                description: 'Legacy model (use text-embedding-3-small instead)'
-            }
+                description: 'Legacy model (use text-embedding-3-small instead)',
+            },
         };
     }
-} 
+}

@@ -62,7 +62,9 @@ export class OllamaEmbedding extends Embedding {
         if (!this.dimensionDetected && !this.config.dimension) {
             this.dimension = await this.detectDimension();
             this.dimensionDetected = true;
-            console.log(`[OllamaEmbedding] 📏 Detected Ollama embedding dimension: ${this.dimension} for model: ${this.config.model}`);
+            console.log(
+                `[OllamaEmbedding] 📏 Detected Ollama embedding dimension: ${this.dimension} for model: ${this.config.model}`,
+            );
         }
 
         const embedOptions: any = {
@@ -84,7 +86,7 @@ export class OllamaEmbedding extends Embedding {
 
         return {
             vector: response.embeddings[0],
-            dimension: this.dimension
+            dimension: this.dimension,
         };
     }
 
@@ -96,7 +98,9 @@ export class OllamaEmbedding extends Embedding {
         if (!this.dimensionDetected && !this.config.dimension) {
             this.dimension = await this.detectDimension();
             this.dimensionDetected = true;
-            console.log(`[OllamaEmbedding] 📏 Detected Ollama embedding dimension: ${this.dimension} for model: ${this.config.model}`);
+            console.log(
+                `[OllamaEmbedding] 📏 Detected Ollama embedding dimension: ${this.dimension} for model: ${this.config.model}`,
+            );
         }
 
         // Use Ollama's native batch embedding API
@@ -120,7 +124,7 @@ export class OllamaEmbedding extends Embedding {
         // Convert to EmbeddingVector format
         return response.embeddings.map((embedding: number[]) => ({
             vector: embedding,
-            dimension: this.dimension
+            dimension: this.dimension,
         }));
     }
 
@@ -145,9 +149,13 @@ export class OllamaEmbedding extends Embedding {
         if (!this.config.dimension) {
             this.dimension = await this.detectDimension();
             this.dimensionDetected = true;
-            console.log(`[OllamaEmbedding] 📏 Detected Ollama embedding dimension: ${this.dimension} for model: ${this.config.model}`);
+            console.log(
+                `[OllamaEmbedding] 📏 Detected Ollama embedding dimension: ${this.dimension} for model: ${this.config.model}`,
+            );
         } else {
-            console.log('[OllamaEmbedding] Dimension already detected for model ' + this.config.model);
+            console.log(
+                '[OllamaEmbedding] Dimension already detected for model ' + this.config.model,
+            );
         }
     }
 
@@ -195,7 +203,7 @@ export class OllamaEmbedding extends Embedding {
         return this.client;
     }
 
-    async detectDimension(testText: string = "test"): Promise<number> {
+    async detectDimension(testText: string = 'test'): Promise<number> {
         console.log(`[OllamaEmbedding] Detecting embedding dimension...`);
 
         try {
@@ -217,7 +225,9 @@ export class OllamaEmbedding extends Embedding {
             }
 
             const dimension = response.embeddings[0].length;
-            console.log(`[OllamaEmbedding] Successfully detected embedding dimension: ${dimension}`);
+            console.log(
+                `[OllamaEmbedding] Successfully detected embedding dimension: ${dimension}`,
+            );
             return dimension;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';

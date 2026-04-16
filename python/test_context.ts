@@ -20,13 +20,13 @@ export async function testContextEndToEnd(config: {
         console.log('📝 Creating OpenAI embedding instance...');
         const embedding = new OpenAIEmbedding({
             apiKey: config.openaiApiKey,
-            model: 'text-embedding-3-small'
+            model: 'text-embedding-3-small',
         });
 
         // 2. Create vector database instance
         console.log('🗄️ Creating Milvus vector database instance...');
         const vectorDB = new MilvusVectorDatabase({
-            address: config.milvusAddress
+            address: config.milvusAddress,
         });
 
         // 3. Create Context instance
@@ -35,7 +35,7 @@ export async function testContextEndToEnd(config: {
         const context = new Context({
             embedding: embedding,
             vectorDatabase: vectorDB,
-            codeSplitter: codeSplitter
+            codeSplitter: codeSplitter,
         });
 
         // 4. Check if index already exists
@@ -53,7 +53,7 @@ export async function testContextEndToEnd(config: {
             console.log('✅ Indexing completed');
         } else {
             console.log('📖 Using existing index');
-            indexStats = { indexedFiles: 0, totalChunks: 0, message: "Using existing index" };
+            indexStats = { indexedFiles: 0, totalChunks: 0, message: 'Using existing index' };
         }
 
         // 6. Execute semantic search
@@ -62,7 +62,7 @@ export async function testContextEndToEnd(config: {
             config.codebasePath,
             config.searchQuery,
             5, // topK
-            0.5 // threshold
+            0.5, // threshold
         );
 
         // 7. Return complete results
@@ -75,38 +75,38 @@ export async function testContextEndToEnd(config: {
                 embeddingDimension: embedding.getDimension(),
                 vectorDatabase: 'Milvus',
                 chunkSize: 1000,
-                chunkOverlap: 200
+                chunkOverlap: 200,
             },
             indexStats: indexStats,
             searchQuery: config.searchQuery,
-            searchResults: searchResults.map(result => ({
+            searchResults: searchResults.map((result) => ({
                 relativePath: result.relativePath,
                 startLine: result.startLine,
                 endLine: result.endLine,
                 language: result.language,
                 score: result.score,
-                contentPreview: result.content.substring(0, 200) + '...'
+                contentPreview: result.content.substring(0, 200) + '...',
             })),
             summary: {
                 indexedFiles: indexStats.indexedFiles || 0,
                 totalChunks: indexStats.totalChunks || 0,
                 foundResults: searchResults.length,
-                avgScore: searchResults.length > 0 ?
-                    searchResults.reduce((sum, r) => sum + r.score, 0) / searchResults.length : 0
-            }
+                avgScore:
+                    searchResults.length > 0
+                        ? searchResults.reduce((sum, r) => sum + r.score, 0) / searchResults.length
+                        : 0,
+            },
         };
 
         console.log('🎉 End-to-end test completed!');
         return result;
-
     } catch (error: any) {
         console.error('❌ End-to-end test failed:', error);
         return {
             success: false,
             timestamp: new Date().toISOString(),
             error: error.message,
-            stack: error.stack
+            stack: error.stack,
         };
     }
 }
-

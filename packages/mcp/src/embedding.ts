@@ -1,8 +1,15 @@
-import { OpenAIEmbedding, VoyageAIEmbedding, GeminiEmbedding, OllamaEmbedding } from "@lbruton/claude-context-core";
-import { ContextMcpConfig } from "./config.js";
+import {
+    OpenAIEmbedding,
+    VoyageAIEmbedding,
+    GeminiEmbedding,
+    OllamaEmbedding,
+} from '@lbruton/claude-context-core';
+import { ContextMcpConfig } from './config.js';
 
 // Helper function to create embedding instance based on provider
-export function createEmbeddingInstance(config: ContextMcpConfig): OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding {
+export function createEmbeddingInstance(
+    config: ContextMcpConfig,
+): OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding {
     console.log(`[EMBEDDING] Creating ${config.embeddingProvider} embedding instance...`);
 
     switch (config.embeddingProvider) {
@@ -15,7 +22,7 @@ export function createEmbeddingInstance(config: ContextMcpConfig): OpenAIEmbeddi
             const openaiEmbedding = new OpenAIEmbedding({
                 apiKey: config.openaiApiKey,
                 model: config.embeddingModel,
-                ...(config.openaiBaseUrl && { baseURL: config.openaiBaseUrl })
+                ...(config.openaiBaseUrl && { baseURL: config.openaiBaseUrl }),
             });
             console.log(`[EMBEDDING] ✅ OpenAI embedding instance created successfully`);
             return openaiEmbedding;
@@ -28,7 +35,7 @@ export function createEmbeddingInstance(config: ContextMcpConfig): OpenAIEmbeddi
             console.log(`[EMBEDDING] 🔧 Configuring VoyageAI with model: ${config.embeddingModel}`);
             const voyageEmbedding = new VoyageAIEmbedding({
                 apiKey: config.voyageaiApiKey,
-                model: config.embeddingModel
+                model: config.embeddingModel,
             });
             console.log(`[EMBEDDING] ✅ VoyageAI embedding instance created successfully`);
             return voyageEmbedding;
@@ -42,44 +49,63 @@ export function createEmbeddingInstance(config: ContextMcpConfig): OpenAIEmbeddi
             const geminiEmbedding = new GeminiEmbedding({
                 apiKey: config.geminiApiKey,
                 model: config.embeddingModel,
-                ...(config.geminiBaseUrl && { baseURL: config.geminiBaseUrl })
+                ...(config.geminiBaseUrl && { baseURL: config.geminiBaseUrl }),
             });
             console.log(`[EMBEDDING] ✅ Gemini embedding instance created successfully`);
             return geminiEmbedding;
 
         case 'Ollama':
             const ollamaHost = config.ollamaHost || 'http://127.0.0.1:11434';
-            console.log(`[EMBEDDING] 🔧 Configuring Ollama with model: ${config.embeddingModel}, host: ${ollamaHost}`);
+            console.log(
+                `[EMBEDDING] 🔧 Configuring Ollama with model: ${config.embeddingModel}, host: ${ollamaHost}`,
+            );
             const ollamaEmbedding = new OllamaEmbedding({
                 model: config.embeddingModel,
-                host: config.ollamaHost
+                host: config.ollamaHost,
             });
             console.log(`[EMBEDDING] ✅ Ollama embedding instance created successfully`);
             return ollamaEmbedding;
 
         default:
-            console.error(`[EMBEDDING] ❌ Unsupported embedding provider: ${config.embeddingProvider}`);
+            console.error(
+                `[EMBEDDING] ❌ Unsupported embedding provider: ${config.embeddingProvider}`,
+            );
             throw new Error(`Unsupported embedding provider: ${config.embeddingProvider}`);
     }
 }
 
-export function logEmbeddingProviderInfo(config: ContextMcpConfig, embedding: OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding): void {
-    console.log(`[EMBEDDING] ✅ Successfully initialized ${config.embeddingProvider} embedding provider`);
-    console.log(`[EMBEDDING] Provider details - Model: ${config.embeddingModel}, Dimension: ${embedding.getDimension()}`);
+export function logEmbeddingProviderInfo(
+    config: ContextMcpConfig,
+    embedding: OpenAIEmbedding | VoyageAIEmbedding | GeminiEmbedding | OllamaEmbedding,
+): void {
+    console.log(
+        `[EMBEDDING] ✅ Successfully initialized ${config.embeddingProvider} embedding provider`,
+    );
+    console.log(
+        `[EMBEDDING] Provider details - Model: ${config.embeddingModel}, Dimension: ${embedding.getDimension()}`,
+    );
 
     // Log provider-specific configuration details
     switch (config.embeddingProvider) {
         case 'OpenAI':
-            console.log(`[EMBEDDING] OpenAI configuration - API Key: ${config.openaiApiKey ? '✅ Provided' : '❌ Missing'}, Base URL: ${config.openaiBaseUrl || 'Default'}`);
+            console.log(
+                `[EMBEDDING] OpenAI configuration - API Key: ${config.openaiApiKey ? '✅ Provided' : '❌ Missing'}, Base URL: ${config.openaiBaseUrl || 'Default'}`,
+            );
             break;
         case 'VoyageAI':
-            console.log(`[EMBEDDING] VoyageAI configuration - API Key: ${config.voyageaiApiKey ? '✅ Provided' : '❌ Missing'}`);
+            console.log(
+                `[EMBEDDING] VoyageAI configuration - API Key: ${config.voyageaiApiKey ? '✅ Provided' : '❌ Missing'}`,
+            );
             break;
         case 'Gemini':
-            console.log(`[EMBEDDING] Gemini configuration - API Key: ${config.geminiApiKey ? '✅ Provided' : '❌ Missing'}, Base URL: ${config.geminiBaseUrl || 'Default'}`);
+            console.log(
+                `[EMBEDDING] Gemini configuration - API Key: ${config.geminiApiKey ? '✅ Provided' : '❌ Missing'}, Base URL: ${config.geminiBaseUrl || 'Default'}`,
+            );
             break;
         case 'Ollama':
-            console.log(`[EMBEDDING] Ollama configuration - Host: ${config.ollamaHost || 'http://127.0.0.1:11434'}, Model: ${config.embeddingModel}`);
+            console.log(
+                `[EMBEDDING] Ollama configuration - Host: ${config.ollamaHost || 'http://127.0.0.1:11434'}, Model: ${config.embeddingModel}`,
+            );
             break;
     }
-} 
+}

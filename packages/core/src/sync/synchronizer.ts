@@ -85,7 +85,9 @@ export class FileSynchronizer {
                         const hash = await this.hashFile(fullPath);
                         fileHashes.set(relativePath, hash);
                     } catch (error: any) {
-                        console.warn(`[Synchronizer] Cannot hash file ${fullPath}: ${error.message}`);
+                        console.warn(
+                            `[Synchronizer] Cannot hash file ${fullPath}: ${error.message}`,
+                        );
                         continue;
                     }
                 }
@@ -98,7 +100,7 @@ export class FileSynchronizer {
     private shouldIgnore(relativePath: string, isDirectory: boolean = false): boolean {
         // Always ignore hidden files and directories (starting with .)
         const pathParts = relativePath.split(path.sep);
-        if (pathParts.some(part => part.startsWith('.'))) {
+        if (pathParts.some((part) => part.startsWith('.'))) {
             return true;
         }
 
@@ -128,8 +130,10 @@ export class FileSynchronizer {
                 // Check directory patterns
                 if (pattern.endsWith('/')) {
                     const dirPattern = pattern.slice(0, -1);
-                    if (this.simpleGlobMatch(partialPath, dirPattern) ||
-                        this.simpleGlobMatch(normalizedPathParts[i], dirPattern)) {
+                    if (
+                        this.simpleGlobMatch(partialPath, dirPattern) ||
+                        this.simpleGlobMatch(normalizedPathParts[i], dirPattern)
+                    ) {
                         return true;
                     }
                 }
@@ -166,8 +170,10 @@ export class FileSynchronizer {
             const dirPattern = cleanPattern.slice(0, -1);
 
             // Direct match or any path component matches
-            return this.simpleGlobMatch(cleanPath, dirPattern) ||
-                cleanPath.split('/').some(part => this.simpleGlobMatch(part, dirPattern));
+            return (
+                this.simpleGlobMatch(cleanPath, dirPattern) ||
+                cleanPath.split('/').some((part) => this.simpleGlobMatch(part, dirPattern))
+            );
         }
 
         // Handle path patterns (containing /)
@@ -198,16 +204,16 @@ export class FileSynchronizer {
         const sortedPaths = keys.slice().sort(); // Create a sorted copy
 
         // Create a root node for the entire directory
-        let valuesString = "";
-        keys.forEach(key => {
+        let valuesString = '';
+        keys.forEach((key) => {
             valuesString += fileHashes.get(key);
         });
-        const rootNodeData = "root:" + valuesString;
+        const rootNodeData = 'root:' + valuesString;
         const rootNodeId = dag.addNode(rootNodeData);
 
         // Add each file as a child of the root
         for (const path of sortedPaths) {
-            const fileData = path + ":" + fileHashes.get(path);
+            const fileData = path + ':' + fileHashes.get(path);
             dag.addNode(fileData, rootNodeId);
         }
 
@@ -218,10 +224,16 @@ export class FileSynchronizer {
         console.log(`Initializing file synchronizer for ${this.rootDir}`);
         await this.loadSnapshot();
         this.merkleDAG = this.buildMerkleDAG(this.fileHashes);
-        console.log(`[Synchronizer] File synchronizer initialized. Loaded ${this.fileHashes.size} file hashes.`);
+        console.log(
+            `[Synchronizer] File synchronizer initialized. Loaded ${this.fileHashes.size} file hashes.`,
+        );
     }
 
-    public async checkForChanges(): Promise<{ added: string[], removed: string[], modified: string[] }> {
+    public async checkForChanges(): Promise<{
+        added: string[];
+        removed: string[];
+        modified: string[];
+    }> {
         console.log('[Synchronizer] Checking for file changes...');
 
         const newFileHashes = await this.generateFileHashes(this.rootDir);
@@ -239,7 +251,9 @@ export class FileSynchronizer {
             this.merkleDAG = newMerkleDAG;
             await this.saveSnapshot();
 
-            console.log(`[Synchronizer] Found changes: ${fileChanges.added.length} added, ${fileChanges.removed.length} removed, ${fileChanges.modified.length} modified.`);
+            console.log(
+                `[Synchronizer] Found changes: ${fileChanges.added.length} added, ${fileChanges.removed.length} removed, ${fileChanges.modified.length} modified.`,
+            );
             return fileChanges;
         }
 
@@ -247,7 +261,10 @@ export class FileSynchronizer {
         return { added: [], removed: [], modified: [] };
     }
 
-    private compareStates(oldHashes: Map<string, string>, newHashes: Map<string, string>): { added: string[], removed: string[], modified: string[] } {
+    private compareStates(
+        oldHashes: Map<string, string>,
+        newHashes: Map<string, string>,
+    ): { added: string[]; removed: string[]; modified: string[] } {
         const added: string[] = [];
         const removed: string[] = [];
         const modified: string[] = [];
@@ -284,13 +301,13 @@ export class FileSynchronizer {
         // Convert Map to array without using iterator
         const fileHashesArray: [string, string][] = [];
         const keys = Array.from(this.fileHashes.keys());
-        keys.forEach(key => {
+        keys.forEach((key) => {
             fileHashesArray.push([key, this.fileHashes.get(key)!]);
         });
 
         const data = JSON.stringify({
             fileHashes: fileHashesArray,
-            merkleDAG: this.merkleDAG.serialize()
+            merkleDAG: this.merkleDAG.serialize(),
         });
         await fs.writeFile(this.snapshotPath, data, 'utf-8');
         console.log(`Saved snapshot to ${this.snapshotPath}`);
@@ -340,7 +357,10 @@ export class FileSynchronizer {
             if (error.code === 'ENOENT') {
                 console.log(`Snapshot file not found (already deleted): ${snapshotPath}`);
             } else {
-                console.error(`[Synchronizer] Failed to delete snapshot file ${snapshotPath}:`, error.message);
+                console.error(
+                    `[Synchronizer] Failed to delete snapshot file ${snapshotPath}:`,
+                    error.message,
+                );
                 throw error; // Re-throw non-ENOENT errors
             }
         }

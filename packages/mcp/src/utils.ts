@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from 'path';
 
 /**
  * Truncate content to specified length
@@ -27,4 +27,4 @@ export function ensureAbsolutePath(inputPath: string): string {
 export function trackCodebasePath(codebasePath: string): void {
     const absolutePath = ensureAbsolutePath(codebasePath);
     console.log(`[TRACKING] Tracked codebase path: ${absolutePath} (not marked as indexed)`);
-} 
+}
