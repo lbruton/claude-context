@@ -10,7 +10,7 @@ You'll need two API keys:
 
 1. **OpenAI API Key**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
 2. **Zilliz Cloud API Key**: ![](../../assets/signup_and_get_apikey.png)
- [Sign up](https://cloud.zilliz.com/signup?utm_source=github&utm_medium=referral&utm_campaign=2507-codecontext-readme) on Zilliz Cloud to get an API key.
+   [Sign up](https://cloud.zilliz.com/signup?utm_source=github&utm_medium=referral&utm_campaign=2507-codecontext-readme) on Zilliz Cloud to get an API key.
 
 ### Step 2: Configure Claude Code
 
@@ -29,18 +29,18 @@ Replace the API keys with your actual keys.
 
 1. **Open Claude Code** in your project directory
 2. **Index your codebase**:
-   ```
-   Index this codebase
-   ```
+    ```
+    Index this codebase
+    ```
 3. **Check indexing status**:
-   ```
-   Check the indexing status
-   ```
+    ```
+    Check the indexing status
+    ```
 4. **Start searching**:
-   ```
-   Find functions that handle user authentication
-   ```
-🎉 **That's it!** You now have semantic code search in Claude Code.
+    ```
+    Find functions that handle user authentication
+    ```
+    🎉 **That's it!** You now have semantic code search in Claude Code.
 
 ## Alternative Quick Setups
 
@@ -78,16 +78,16 @@ Gemini CLI requires manual configuration through a JSON file:
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -102,16 +102,16 @@ Create or edit the `~/.qwen/settings.json` file and add the following configurat
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -125,78 +125,80 @@ Go to: `Settings` -> `Cursor Settings` -> `MCP` -> `Add new global MCP server`
 Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file is the recommended approach. You may also install in a specific project by creating `.cursor/mcp.json` in your project folder. See [Cursor MCP docs](https://docs.cursor.com/context/model-context-protocol) for more info.
 
 **OpenAI Configuration (Default):**
+
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "EMBEDDING_PROVIDER": "OpenAI",
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "EMBEDDING_PROVIDER": "OpenAI",
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
 **VoyageAI Configuration:**
+
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "EMBEDDING_PROVIDER": "VoyageAI",
-        "VOYAGEAI_API_KEY": "your-voyageai-api-key",
-        "EMBEDDING_MODEL": "voyage-code-3",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "EMBEDDING_PROVIDER": "VoyageAI",
+                "VOYAGEAI_API_KEY": "your-voyageai-api-key",
+                "EMBEDDING_MODEL": "voyage-code-3",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
 **Gemini Configuration:**
+
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "EMBEDDING_PROVIDER": "Gemini",
-        "GEMINI_API_KEY": "your-gemini-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "EMBEDDING_PROVIDER": "Gemini",
+                "GEMINI_API_KEY": "your-gemini-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
 **Ollama Configuration:**
+
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "EMBEDDING_PROVIDER": "Ollama",
-        "EMBEDDING_MODEL": "nomic-embed-text",
-        "OLLAMA_HOST": "http://127.0.0.1:11434",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "EMBEDDING_PROVIDER": "Ollama",
+                "EMBEDDING_MODEL": "nomic-embed-text",
+                "OLLAMA_HOST": "http://127.0.0.1:11434",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
 </details>
-
-
 
 <details>
 <summary><strong>Void</strong></summary>
@@ -207,17 +209,17 @@ Add the following configuration to your Void MCP settings:
 
 ```json
 {
-  "mcpServers": {
-    "code-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_ADDRESS": "your-zilliz-cloud-public-endpoint",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "code-context": {
+            "command": "npx",
+            "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_ADDRESS": "your-zilliz-cloud-public-endpoint",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -230,16 +232,16 @@ Add to your Claude Desktop configuration:
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -252,16 +254,16 @@ Windsurf supports MCP configuration through a JSON file. Add the following confi
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -274,16 +276,16 @@ The Claude Context MCP server can be used with VS Code through MCP-compatible ex
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["-y", "@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -296,13 +298,13 @@ Cherry Studio allows for visual MCP server configuration through its settings in
 
 1. Navigate to **Settings → MCP Servers → Add Server**.
 2. Fill in the server details:
-   - **Name**: `claude-context`
-   - **Type**: `STDIO`
-   - **Command**: `npx`
-   - **Arguments**: `["@zilliz/claude-context-mcp@latest"]`
-   - **Environment Variables**:
-     - `OPENAI_API_KEY`: `your-openai-api-key`
-     - `MILVUS_TOKEN`: `your-zilliz-cloud-api-key`
+    - **Name**: `claude-context`
+    - **Type**: `STDIO`
+    - **Command**: `npx`
+    - **Arguments**: `["@zilliz/claude-context-mcp@latest"]`
+    - **Environment Variables**:
+        - `OPENAI_API_KEY`: `your-openai-api-key`
+        - `MILVUS_TOKEN`: `your-zilliz-cloud-api-key`
 3. Save the configuration to activate the server.
 
 </details>
@@ -320,16 +322,16 @@ Cline uses a JSON configuration file to manage MCP servers. To integrate the pro
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -354,15 +356,15 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
 
 5. Enter the following command:
 
-   ```
-   npx @zilliz/claude-context-mcp@latest
-   ```
+    ```
+    npx @zilliz/claude-context-mcp@latest
+    ```
 
 6. Name the MCP: **Claude Context**.
 
 7. Click the **Add** button.
 
-------
+---
 
 #### **B. Manual Configuration**
 
@@ -372,14 +374,14 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
 4. Add the server configuration to the `mcpServers` array in the `augment.advanced` object
 
 ```json
-"augment.advanced": { 
-  "mcpServers": [ 
-    { 
-      "name": "claude-context", 
-      "command": "npx", 
-      "args": ["-y", "@zilliz/claude-context-mcp@latest"] 
-    } 
-  ] 
+"augment.advanced": {
+  "mcpServers": [
+    {
+      "name": "claude-context",
+      "command": "npx",
+      "args": ["-y", "@zilliz/claude-context-mcp@latest"]
+    }
+  ]
 }
 ```
 
@@ -396,23 +398,22 @@ Roo Code utilizes a JSON configuration file for MCP servers:
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["@zilliz/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key",
-        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
-      }
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["@zilliz/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "your-openai-api-key",
+                "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+            }
+        }
     }
-  }
 }
 ```
 
 3. Save the file to activate the server.
 
 </details>
-
 
 <details>
 <summary><strong>Zencoder</strong></summary>
@@ -429,12 +430,11 @@ Zencoder offers support for MCP tools and servers in both its JetBrains and VS C
     "command": "npx",
     "args": ["@zilliz/claude-context-mcp@latest"],
     "env": {
-      "OPENAI_API_KEY": "your-openai-api-key",
-      "MILVUS_ADDRESS": "your-zilliz-cloud-public-endpoint",
-      "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
+        "OPENAI_API_KEY": "your-openai-api-key",
+        "MILVUS_ADDRESS": "your-zilliz-cloud-public-endpoint",
+        "MILVUS_TOKEN": "your-zilliz-cloud-api-key"
     }
 }
-
 ```
 
 5. Save the server by hitting the `Install` button.

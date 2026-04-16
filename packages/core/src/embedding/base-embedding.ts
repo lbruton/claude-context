@@ -32,7 +32,7 @@ export abstract class Embedding {
     }
 
     /**
-     * Detect embedding dimension 
+     * Detect embedding dimension
      * @param testText Test text for dimension detection
      * @returns Embedding dimension
      */
@@ -44,7 +44,7 @@ export abstract class Embedding {
      * @returns Array of processed texts
      */
     protected preprocessTexts(texts: string[]): string[] {
-        return texts.map(text => this.preprocessText(text));
+        return texts.map((text) => this.preprocessText(text));
     }
 
     // Abstract methods that must be implemented by subclasses
@@ -73,4 +73,4 @@ export abstract class Embedding {
      * @returns Provider name
      */
     abstract getProvider(): string;
-} 
+}

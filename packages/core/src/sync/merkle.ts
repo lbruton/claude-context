@@ -28,7 +28,7 @@ export class MerkleDAG {
             hash: nodeId,
             data,
             parents: [],
-            children: []
+            children: [],
         };
 
         // If there's a parent, create the relationship
@@ -57,17 +57,17 @@ export class MerkleDAG {
     }
 
     public getRootNodes(): MerkleDAGNode[] {
-        return this.rootIds.map(id => this.nodes.get(id)!).filter(Boolean);
+        return this.rootIds.map((id) => this.nodes.get(id)!).filter(Boolean);
     }
 
     public getLeafNodes(): MerkleDAGNode[] {
-        return Array.from(this.nodes.values()).filter(node => node.children.length === 0);
+        return Array.from(this.nodes.values()).filter((node) => node.children.length === 0);
     }
 
     public serialize(): any {
         return {
             nodes: Array.from(this.nodes.entries()),
-            rootIds: this.rootIds
+            rootIds: this.rootIds,
         };
     }
 
@@ -78,13 +78,16 @@ export class MerkleDAG {
         return dag;
     }
 
-    public static compare(dag1: MerkleDAG, dag2: MerkleDAG): { added: string[], removed: string[], modified: string[] } {
-        const nodes1 = new Map(Array.from(dag1.getAllNodes()).map(n => [n.id, n]));
-        const nodes2 = new Map(Array.from(dag2.getAllNodes()).map(n => [n.id, n]));
+    public static compare(
+        dag1: MerkleDAG,
+        dag2: MerkleDAG,
+    ): { added: string[]; removed: string[]; modified: string[] } {
+        const nodes1 = new Map(Array.from(dag1.getAllNodes()).map((n) => [n.id, n]));
+        const nodes2 = new Map(Array.from(dag2.getAllNodes()).map((n) => [n.id, n]));
 
-        const added = Array.from(nodes2.keys()).filter(k => !nodes1.has(k));
-        const removed = Array.from(nodes1.keys()).filter(k => !nodes2.has(k));
-        
+        const added = Array.from(nodes2.keys()).filter((k) => !nodes1.has(k));
+        const removed = Array.from(nodes1.keys()).filter((k) => !nodes2.has(k));
+
         // For modified, we'll check if the data has changed for nodes that exist in both
         const modified: string[] = [];
         for (const [id, node1] of Array.from(nodes1.entries())) {
@@ -96,4 +99,4 @@ export class MerkleDAG {
 
         return { added, removed, modified };
     }
-} 
+}

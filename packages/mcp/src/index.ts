@@ -15,21 +15,23 @@ console.warn = (...args: any[]) => {
 
 // console.error already goes to stderr by default
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-    ListToolsRequestSchema,
-    CallToolRequestSchema
-} from "@modelcontextprotocol/sdk/types.js";
-import { Context } from "@lbruton/claude-context-core";
-import { MilvusVectorDatabase } from "@lbruton/claude-context-core";
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { Context } from '@lbruton/claude-context-core';
+import { MilvusVectorDatabase } from '@lbruton/claude-context-core';
 
 // Import our modular components
-import { createMcpConfig, logConfigurationSummary, showHelpMessage, ContextMcpConfig } from "./config.js";
-import { createEmbeddingInstance, logEmbeddingProviderInfo } from "./embedding.js";
-import { SnapshotManager } from "./snapshot.js";
-import { SyncManager } from "./sync.js";
-import { ToolHandlers } from "./handlers.js";
+import {
+    createMcpConfig,
+    logConfigurationSummary,
+    showHelpMessage,
+    ContextMcpConfig,
+} from './config.js';
+import { createEmbeddingInstance, logEmbeddingProviderInfo } from './embedding.js';
+import { SnapshotManager } from './snapshot.js';
+import { SyncManager } from './sync.js';
+import { ToolHandlers } from './handlers.js';
 
 class ContextMcpServer {
     private server: Server;
@@ -44,13 +46,13 @@ class ContextMcpServer {
         this.server = new Server(
             {
                 name: config.name,
-                version: config.version
+                version: config.version,
             },
             {
                 capabilities: {
-                    tools: {}
-                }
-            }
+                    tools: {},
+                },
+            },
         );
 
         // Initialize embedding provider
@@ -63,13 +65,13 @@ class ContextMcpServer {
         // Initialize vector database
         this.vectorDatabase = new MilvusVectorDatabase({
             address: config.milvusAddress,
-            ...(config.milvusToken && { token: config.milvusToken })
+            ...(config.milvusToken && { token: config.milvusToken }),
         });
 
         // Initialize Claude Context
         this.context = new Context({
             embedding,
-            vectorDatabase: this.vectorDatabase
+            vectorDatabase: this.vectorDatabase,
         });
 
         // Initialize managers
@@ -94,7 +96,6 @@ Index a codebase directory to enable semantic search using a configurable code s
 - This tool is typically used when search fails due to an unindexed codebase.
 - If indexing is attempted on an already indexed path, and a conflict is detected, you MUST prompt the user to confirm whether to proceed with a force index (i.e., re-indexing and overwriting the previous index).
 `;
-
 
         const search_description = `
 Search the indexed codebase using natural language queries within a specified absolute path.
@@ -122,107 +123,112 @@ This tool is versatile and can be used before completing various tasks to retrie
             return {
                 tools: [
                     {
-                        name: "index_codebase",
+                        name: 'index_codebase',
                         description: index_description,
                         inputSchema: {
-                            type: "object",
+                            type: 'object',
                             properties: {
                                 path: {
-                                    type: "string",
-                                    description: `ABSOLUTE path to the codebase directory to index.`
+                                    type: 'string',
+                                    description: `ABSOLUTE path to the codebase directory to index.`,
                                 },
                                 force: {
-                                    type: "boolean",
-                                    description: "Force re-indexing even if already indexed",
-                                    default: false
+                                    type: 'boolean',
+                                    description: 'Force re-indexing even if already indexed',
+                                    default: false,
                                 },
                                 splitter: {
-                                    type: "string",
-                                    description: "Code splitter to use: 'ast' for syntax-aware splitting with automatic fallback, 'langchain' for character-based splitting",
-                                    enum: ["ast", "langchain"],
-                                    default: "ast"
+                                    type: 'string',
+                                    description:
+                                        "Code splitter to use: 'ast' for syntax-aware splitting with automatic fallback, 'langchain' for character-based splitting",
+                                    enum: ['ast', 'langchain'],
+                                    default: 'ast',
                                 },
                                 customExtensions: {
-                                    type: "array",
+                                    type: 'array',
                                     items: {
-                                        type: "string"
+                                        type: 'string',
                                     },
-                                    description: "Optional: Additional file extensions to include beyond defaults (e.g., ['.vue', '.svelte', '.astro']). Extensions should include the dot prefix or will be automatically added",
-                                    default: []
+                                    description:
+                                        "Optional: Additional file extensions to include beyond defaults (e.g., ['.vue', '.svelte', '.astro']). Extensions should include the dot prefix or will be automatically added",
+                                    default: [],
                                 },
                                 ignorePatterns: {
-                                    type: "array",
+                                    type: 'array',
                                     items: {
-                                        type: "string"
+                                        type: 'string',
                                     },
-                                    description: "Optional: Additional ignore patterns to exclude specific files/directories beyond defaults. Only include this parameter if the user explicitly requests custom ignore patterns (e.g., ['static/**', '*.tmp', 'private/**'])",
-                                    default: []
-                                }
+                                    description:
+                                        "Optional: Additional ignore patterns to exclude specific files/directories beyond defaults. Only include this parameter if the user explicitly requests custom ignore patterns (e.g., ['static/**', '*.tmp', 'private/**'])",
+                                    default: [],
+                                },
                             },
-                            required: ["path"]
-                        }
+                            required: ['path'],
+                        },
                     },
                     {
-                        name: "search_code",
+                        name: 'search_code',
                         description: search_description,
                         inputSchema: {
-                            type: "object",
+                            type: 'object',
                             properties: {
                                 path: {
-                                    type: "string",
-                                    description: `ABSOLUTE path to the codebase directory to search in.`
+                                    type: 'string',
+                                    description: `ABSOLUTE path to the codebase directory to search in.`,
                                 },
                                 query: {
-                                    type: "string",
-                                    description: "Natural language query to search for in the codebase"
+                                    type: 'string',
+                                    description:
+                                        'Natural language query to search for in the codebase',
                                 },
                                 limit: {
-                                    type: "number",
-                                    description: "Maximum number of results to return",
+                                    type: 'number',
+                                    description: 'Maximum number of results to return',
                                     default: 10,
-                                    maximum: 50
+                                    maximum: 50,
                                 },
                                 extensionFilter: {
-                                    type: "array",
+                                    type: 'array',
                                     items: {
-                                        type: "string"
+                                        type: 'string',
                                     },
-                                    description: "Optional: List of file extensions to filter results. (e.g., ['.ts','.py']).",
-                                    default: []
-                                }
+                                    description:
+                                        "Optional: List of file extensions to filter results. (e.g., ['.ts','.py']).",
+                                    default: [],
+                                },
                             },
-                            required: ["path", "query"]
-                        }
+                            required: ['path', 'query'],
+                        },
                     },
                     {
-                        name: "clear_index",
+                        name: 'clear_index',
                         description: `Clear the search index. IMPORTANT: You MUST provide an absolute path.`,
                         inputSchema: {
-                            type: "object",
+                            type: 'object',
                             properties: {
                                 path: {
-                                    type: "string",
-                                    description: `ABSOLUTE path to the codebase directory to clear.`
-                                }
+                                    type: 'string',
+                                    description: `ABSOLUTE path to the codebase directory to clear.`,
+                                },
                             },
-                            required: ["path"]
-                        }
+                            required: ['path'],
+                        },
                     },
                     {
-                        name: "get_indexing_status",
+                        name: 'get_indexing_status',
                         description: `Get the current indexing status of a codebase. Shows progress percentage for actively indexing codebases and completion status for indexed codebases.`,
                         inputSchema: {
-                            type: "object",
+                            type: 'object',
                             properties: {
                                 path: {
-                                    type: "string",
-                                    description: `ABSOLUTE path to the codebase directory to check status for.`
-                                }
+                                    type: 'string',
+                                    description: `ABSOLUTE path to the codebase directory to check status for.`,
+                                },
                             },
-                            required: ["path"]
-                        }
+                            required: ['path'],
+                        },
                     },
-                ]
+                ],
             };
         });
 
@@ -231,13 +237,13 @@ This tool is versatile and can be used before completing various tasks to retrie
             const { name, arguments: args } = request.params;
 
             switch (name) {
-                case "index_codebase":
+                case 'index_codebase':
                     return await this.toolHandlers.handleIndexCodebase(args);
-                case "search_code":
+                case 'search_code':
                     return await this.toolHandlers.handleSearchCode(args);
-                case "clear_index":
+                case 'clear_index':
                     return await this.toolHandlers.handleClearIndex(args);
-                case "get_indexing_status":
+                case 'get_indexing_status':
                     return await this.toolHandlers.handleGetIndexingStatus(args);
 
                 default:
@@ -287,17 +293,17 @@ async function main() {
 
 // Handle graceful shutdown
 process.on('SIGINT', () => {
-    console.error("Received SIGINT, shutting down gracefully...");
+    console.error('Received SIGINT, shutting down gracefully...');
     process.exit(0);
 });
 
 process.on('SIGTERM', () => {
-    console.error("Received SIGTERM, shutting down gracefully...");
+    console.error('Received SIGTERM, shutting down gracefully...');
     process.exit(0);
 });
 
 // Always start the server - this is designed to be the main entry point
 main().catch((error) => {
-    console.error("Fatal error:", error);
+    console.error('Fatal error:', error);
     process.exit(1);
 });

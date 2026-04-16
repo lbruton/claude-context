@@ -2,7 +2,23 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { Splitter, CodeChunk } from './index';
 
 // Define LangChain supported language types
-type SupportedLanguage = "cpp" | "go" | "java" | "js" | "php" | "proto" | "python" | "rst" | "ruby" | "rust" | "scala" | "swift" | "markdown" | "latex" | "html" | "sol";
+type SupportedLanguage =
+    | 'cpp'
+    | 'go'
+    | 'java'
+    | 'js'
+    | 'php'
+    | 'proto'
+    | 'python'
+    | 'rst'
+    | 'ruby'
+    | 'rust'
+    | 'scala'
+    | 'swift'
+    | 'markdown'
+    | 'latex'
+    | 'html'
+    | 'sol';
 
 export class LangChainCodeSplitter implements Splitter {
     private chunkSize: number = 1000;
@@ -18,13 +34,10 @@ export class LangChainCodeSplitter implements Splitter {
             // Create language-specific splitter
             const mappedLanguage = this.mapLanguage(language);
             if (mappedLanguage) {
-                const splitter = RecursiveCharacterTextSplitter.fromLanguage(
-                    mappedLanguage,
-                    {
-                        chunkSize: this.chunkSize,
-                        chunkOverlap: this.chunkOverlap,
-                    }
-                );
+                const splitter = RecursiveCharacterTextSplitter.fromLanguage(mappedLanguage, {
+                    chunkSize: this.chunkSize,
+                    chunkOverlap: this.chunkOverlap,
+                });
 
                 // Split code
                 const documents = await splitter.createDocuments([code]);
@@ -64,32 +77,36 @@ export class LangChainCodeSplitter implements Splitter {
     private mapLanguage(language: string): SupportedLanguage | null {
         // Map common language names to LangChain supported formats
         const languageMap: Record<string, SupportedLanguage> = {
-            'javascript': 'js',
-            'typescript': 'js',
-            'python': 'python',
-            'java': 'java',
-            'cpp': 'cpp',
+            javascript: 'js',
+            typescript: 'js',
+            python: 'python',
+            java: 'java',
+            cpp: 'cpp',
             'c++': 'cpp',
-            'c': 'cpp',
-            'go': 'go',
-            'rust': 'rust',
-            'php': 'php',
-            'ruby': 'ruby',
-            'swift': 'swift',
-            'scala': 'scala',
-            'html': 'html',
-            'markdown': 'markdown',
-            'md': 'markdown',
-            'latex': 'latex',
-            'tex': 'latex',
-            'solidity': 'sol',
-            'sol': 'sol',
+            c: 'cpp',
+            go: 'go',
+            rust: 'rust',
+            php: 'php',
+            ruby: 'ruby',
+            swift: 'swift',
+            scala: 'scala',
+            html: 'html',
+            markdown: 'markdown',
+            md: 'markdown',
+            latex: 'latex',
+            tex: 'latex',
+            solidity: 'sol',
+            sol: 'sol',
         };
 
         return languageMap[language.toLowerCase()] || null;
     }
 
-    private async fallbackSplit(code: string, language: string, filePath?: string): Promise<CodeChunk[]> {
+    private async fallbackSplit(
+        code: string,
+        language: string,
+        filePath?: string,
+    ): Promise<CodeChunk[]> {
         // Generic splitter as fallback
         const splitter = new RecursiveCharacterTextSplitter({
             chunkSize: this.chunkSize,
@@ -129,4 +146,4 @@ export class LangChainCodeSplitter implements Splitter {
 
         return { start: startLine, end: endLine };
     }
-} 
+}

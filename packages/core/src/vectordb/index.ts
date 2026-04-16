@@ -8,9 +8,9 @@ export {
     HybridSearchOptions,
     HybridSearchResult,
     RerankStrategy,
-    COLLECTION_LIMIT_MESSAGE
+    COLLECTION_LIMIT_MESSAGE,
 } from './types';
 
 // Implementation class exports
 export { MilvusRestfulVectorDatabase, MilvusRestfulConfig } from './milvus-restful-vectordb';
-export { MilvusVectorDatabase, MilvusConfig } from './milvus-vectordb'; 
+export { MilvusVectorDatabase, MilvusConfig } from './milvus-vectordb';

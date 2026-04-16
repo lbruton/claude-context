@@ -17,13 +17,22 @@
         "release:core": "pnpm --filter @lbruton/claude-context-core... run build && pnpm --filter @lbruton/claude-context-core publish --access public --no-git-checks",
         "release:mcp": "pnpm --filter @lbruton/claude-context-mcp... run build && pnpm --filter @lbruton/claude-context-mcp publish --access public --no-git-checks",
         "example:basic": "pnpm --filter claude-context-basic-example start",
-        "benchmark": "node scripts/build-benchmark.js"
+        "benchmark": "node scripts/build-benchmark.js",
+        "prepare": "husky",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "lint-staged": {
+        "*.{ts,js,json,md,yaml,yml}": "prettier --write"
     },
     "devDependencies": {
         "@types/node": "^20.19.37",
         "@typescript-eslint/eslint-plugin": "^8.58.0",
         "@typescript-eslint/parser": "^8.58.0",
         "eslint": "^9.39.4",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.4.0",
+        "prettier": "^3.8.3",
         "rimraf": "^6.1.3",
         "tree-sitter-cli": "^0.25.10",
         "typescript": "^5.9.3"
@@ -41,7 +50,23 @@
             "@langchain/core": ">=0.3.80",
             "langsmith": ">=0.4.6",
             "qs": ">=6.14.2"
-        }
+        },
+        "ignoredBuiltDependencies": [
+            "esbuild",
+            "faiss-node",
+            "protobufjs",
+            "tree-sitter",
+            "tree-sitter-c-sharp",
+            "tree-sitter-cpp",
+            "tree-sitter-go",
+            "tree-sitter-java",
+            "tree-sitter-javascript",
+            "tree-sitter-python",
+            "tree-sitter-rust",
+            "tree-sitter-scala",
+            "tree-sitter-typescript",
+            "unrs-resolver"
+        ]
     },
     "license": "MIT",
     "author": "Cheney Zhang <277584121@qq.com>"

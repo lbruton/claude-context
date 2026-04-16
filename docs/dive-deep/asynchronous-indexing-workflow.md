@@ -10,10 +10,9 @@ Claude Context MCP server allows users to start indexing and get an immediate re
 
 ![Sequence Diagram](../../assets/docs/indexing-sequence-diagram.png)
 
-The sequence diagram above demonstrates the timing and interaction between the agent, MCP server, and background process. 
+The sequence diagram above demonstrates the timing and interaction between the agent, MCP server, and background process.
 
 The agent receives an immediate response when starting indexing, then the users can perform searches and status checks through the agent while indexing continues in the background.
-
 
 ## State Flow
 
@@ -34,7 +33,6 @@ The flow diagram above shows the complete indexing workflow, illustrating how th
 - **`indexing`** - 🔄 Background process running
 - **`indexfailed`** - ❌ Error occurred, can retry
 - **`not_found`** - ❌ Not indexed yet
-
 
 ## Key Benefits
 

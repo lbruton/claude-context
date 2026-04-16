@@ -26,33 +26,33 @@ In `~/.claude/.mcp.json`:
 
 ```json
 {
-  "mcpServers": {
-    "claude-context": {
-      "command": "npx",
-      "args": ["-y", "@lbruton/claude-context-mcp@latest"],
-      "env": {
-        "OPENAI_API_KEY": "sk-...",
-        "EMBEDDING_PROVIDER": "OpenAI",
-        "EMBEDDING_MODEL": "text-embedding-3-small",
-        "MILVUS_ADDRESS": "192.168.1.81:19530"
-      },
-      "startupTimeoutMs": 30000
+    "mcpServers": {
+        "claude-context": {
+            "command": "npx",
+            "args": ["-y", "@lbruton/claude-context-mcp@latest"],
+            "env": {
+                "OPENAI_API_KEY": "sk-...",
+                "EMBEDDING_PROVIDER": "OpenAI",
+                "EMBEDDING_MODEL": "text-embedding-3-small",
+                "MILVUS_ADDRESS": "192.168.1.81:19530"
+            },
+            "startupTimeoutMs": 30000
+        }
     }
-  }
 }
 ```
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `MILVUS_ADDRESS` | Yes | Milvus gRPC endpoint (e.g., `localhost:19530`) |
-| `OPENAI_API_KEY` | Yes* | OpenAI API key for embeddings |
-| `EMBEDDING_PROVIDER` | No | `OpenAI` (default), `VoyageAI`, `Gemini`, `Ollama` |
-| `EMBEDDING_MODEL` | No | Model name (default: `text-embedding-3-small`) |
-| `MILVUS_TOKEN` | No | Milvus authentication token (optional) |
+| Variable             | Required | Description                                        |
+| -------------------- | -------- | -------------------------------------------------- |
+| `MILVUS_ADDRESS`     | Yes      | Milvus gRPC endpoint (e.g., `localhost:19530`)     |
+| `OPENAI_API_KEY`     | Yes\*    | OpenAI API key for embeddings                      |
+| `EMBEDDING_PROVIDER` | No       | `OpenAI` (default), `VoyageAI`, `Gemini`, `Ollama` |
+| `EMBEDDING_MODEL`    | No       | Model name (default: `text-embedding-3-small`)     |
+| `MILVUS_TOKEN`       | No       | Milvus authentication token (optional)             |
 
-*Required when using OpenAI embeddings (default).
+\*Required when using OpenAI embeddings (default).
 
 ## Local Milvus Setup
 

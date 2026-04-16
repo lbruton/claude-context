@@ -2,10 +2,7 @@ module.exports = {
     root: true,
     parser: '@typescript-eslint/parser',
     plugins: ['@typescript-eslint'],
-    extends: [
-        'eslint:recommended',
-        '@typescript-eslint/recommended',
-    ],
+    extends: ['eslint:recommended', '@typescript-eslint/recommended'],
     parserOptions: {
         ecmaVersion: 2020,
         sourceType: 'module',
@@ -20,10 +17,5 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-explicit-any': 'warn',
     },
-    ignorePatterns: [
-        'dist',
-        'node_modules',
-        '*.js',
-        '*.d.ts',
-    ],
-}; 
+    ignorePatterns: ['dist', 'node_modules', '*.js', '*.d.ts'],
+};

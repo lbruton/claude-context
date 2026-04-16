@@ -1,4 +1,10 @@
-import { Context, MilvusVectorDatabase, MilvusRestfulVectorDatabase, AstCodeSplitter, LangChainCodeSplitter } from '@zilliz/claude-context-core';
+import {
+    Context,
+    MilvusVectorDatabase,
+    MilvusRestfulVectorDatabase,
+    AstCodeSplitter,
+    LangChainCodeSplitter,
+} from '@zilliz/claude-context-core';
 import { envManager } from '@zilliz/claude-context-core';
 import * as path from 'path';
 
@@ -30,13 +36,13 @@ async function main() {
             // Use RESTful implementation (for environments without gRPC support)
             vectorDatabase = new MilvusRestfulVectorDatabase({
                 address: milvusAddress,
-                ...(milvusToken && { token: milvusToken })
+                ...(milvusToken && { token: milvusToken }),
             });
         } else {
             // Use gRPC implementation (default, more efficient)
             vectorDatabase = new MilvusVectorDatabase({
                 address: milvusAddress,
-                ...(milvusToken && { token: milvusToken })
+                ...(milvusToken && { token: milvusToken }),
             });
         }
 
@@ -50,7 +56,7 @@ async function main() {
         const context = new Context({
             vectorDatabase,
             codeSplitter,
-            supportedExtensions: ['.ts', '.js', '.py', '.java', '.cpp', '.go', '.rs']
+            supportedExtensions: ['.ts', '.js', '.py', '.java', '.cpp', '.go', '.rs'],
         });
 
         // 3. Check if index already exists and clear if needed
@@ -68,7 +74,9 @@ async function main() {
         const indexStats = await context.indexCodebase(codebasePath);
 
         // 4. Show indexing statistics
-        console.log(`\n📊 Indexing stats: ${indexStats.indexedFiles} files, ${indexStats.totalChunks} code chunks`);
+        console.log(
+            `\n📊 Indexing stats: ${indexStats.indexedFiles} files, ${indexStats.totalChunks} code chunks`,
+        );
 
         // 5. Perform semantic search
         console.log('\n🔍 Performing semantic search...');
@@ -77,7 +85,7 @@ async function main() {
             'vector database operations',
             'code splitting functions',
             'embedding generation',
-            'typescript interface definitions'
+            'typescript interface definitions',
         ];
 
         for (const query of queries) {
@@ -98,14 +106,15 @@ async function main() {
         }
 
         console.log('\n🎉 Example completed successfully!');
-
     } catch (error) {
         console.error('❌ Error occurred:', error);
 
         // Provide detailed error diagnostics
         if (error instanceof Error) {
             if (error.message.includes('API key')) {
-                console.log('\n💡 Please make sure to set the correct OPENAI_API_KEY environment variable');
+                console.log(
+                    '\n💡 Please make sure to set the correct OPENAI_API_KEY environment variable',
+                );
                 console.log('   Example: export OPENAI_API_KEY="your-actual-api-key"');
             } else if (error.message.includes('Milvus') || error.message.includes('connect')) {
                 console.log('\n💡 Please make sure Milvus service is running');
@@ -121,7 +130,9 @@ async function main() {
             console.log('   - OPENAI_BASE_URL: Custom OpenAI API endpoint (optional)');
             console.log('   - MILVUS_ADDRESS: Milvus server address (default: localhost:19530)');
             console.log('   - MILVUS_TOKEN: Milvus authentication token (optional)');
-            console.log('   - SPLITTER_TYPE: Code splitter type - "ast" or "langchain" (default: ast)');
+            console.log(
+                '   - SPLITTER_TYPE: Code splitter type - "ast" or "langchain" (default: ast)',
+            );
         }
 
         process.exit(1);

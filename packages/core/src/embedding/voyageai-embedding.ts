@@ -82,7 +82,7 @@ export class VoyageAIEmbedding extends Embedding {
 
         return {
             vector: response.data[0].embedding,
-            dimension: this.dimension
+            dimension: this.dimension,
         };
     }
 
@@ -106,7 +106,7 @@ export class VoyageAIEmbedding extends Embedding {
             }
             return {
                 vector: item.embedding,
-                dimension: this.dimension
+                dimension: this.dimension,
             };
         });
     }
@@ -146,102 +146,105 @@ export class VoyageAIEmbedding extends Embedding {
     /**
      * Get list of supported models
      */
-    static getSupportedModels(): Record<string, { dimension: number | string; contextLength: number; description: string }> {
+    static getSupportedModels(): Record<
+        string,
+        { dimension: number | string; contextLength: number; description: string }
+    > {
         return {
             // Latest recommended models
             'voyage-3-large': {
                 dimension: '1024 (default), 256, 512, 2048',
                 contextLength: 32000,
-                description: 'The best general-purpose and multilingual retrieval quality'
+                description: 'The best general-purpose and multilingual retrieval quality',
             },
             'voyage-3.5': {
                 dimension: '1024 (default), 256, 512, 2048',
                 contextLength: 32000,
-                description: 'Optimized for general-purpose and multilingual retrieval quality'
+                description: 'Optimized for general-purpose and multilingual retrieval quality',
             },
             'voyage-3.5-lite': {
                 dimension: '1024 (default), 256, 512, 2048',
                 contextLength: 32000,
-                description: 'Optimized for latency and cost'
+                description: 'Optimized for latency and cost',
             },
             'voyage-code-3': {
                 dimension: '1024 (default), 256, 512, 2048',
                 contextLength: 32000,
-                description: 'Optimized for code retrieval (recommended for code)'
+                description: 'Optimized for code retrieval (recommended for code)',
             },
             // Professional domain models
             'voyage-finance-2': {
                 dimension: 1024,
                 contextLength: 32000,
-                description: 'Optimized for finance retrieval and RAG'
+                description: 'Optimized for finance retrieval and RAG',
             },
             'voyage-law-2': {
                 dimension: 1024,
                 contextLength: 16000,
-                description: 'Optimized for legal retrieval and RAG'
+                description: 'Optimized for legal retrieval and RAG',
             },
             'voyage-multilingual-2': {
                 dimension: 1024,
                 contextLength: 32000,
-                description: 'Legacy: Use voyage-3.5 for multilingual tasks'
+                description: 'Legacy: Use voyage-3.5 for multilingual tasks',
             },
             'voyage-large-2-instruct': {
                 dimension: 1024,
                 contextLength: 16000,
-                description: 'Legacy: Use voyage-3.5 instead'
+                description: 'Legacy: Use voyage-3.5 instead',
             },
             // Legacy models
             'voyage-large-2': {
                 dimension: 1536,
                 contextLength: 16000,
-                description: 'Legacy: Use voyage-3.5 instead'
+                description: 'Legacy: Use voyage-3.5 instead',
             },
             'voyage-code-2': {
                 dimension: 1536,
                 contextLength: 16000,
-                description: 'Previous generation of code embeddings'
+                description: 'Previous generation of code embeddings',
             },
             'voyage-3': {
                 dimension: 1024,
                 contextLength: 32000,
-                description: 'Legacy: Use voyage-3.5 instead'
+                description: 'Legacy: Use voyage-3.5 instead',
             },
             'voyage-3-lite': {
                 dimension: 512,
                 contextLength: 32000,
-                description: 'Legacy: Use voyage-3.5-lite instead'
+                description: 'Legacy: Use voyage-3.5-lite instead',
             },
             'voyage-2': {
                 dimension: 1024,
                 contextLength: 4000,
-                description: 'Legacy: Use voyage-3.5-lite instead'
+                description: 'Legacy: Use voyage-3.5-lite instead',
             },
             // Other legacy models
             'voyage-02': {
                 dimension: 1024,
                 contextLength: 4000,
-                description: 'Legacy model'
+                description: 'Legacy model',
             },
             'voyage-01': {
                 dimension: 1024,
                 contextLength: 4000,
-                description: 'Legacy model'
+                description: 'Legacy model',
             },
             'voyage-lite-01': {
                 dimension: 1024,
                 contextLength: 4000,
-                description: 'Legacy model'
+                description: 'Legacy model',
             },
             'voyage-lite-01-instruct': {
                 dimension: 1024,
                 contextLength: 4000,
-                description: 'Legacy model'
+                description: 'Legacy model',
             },
             'voyage-lite-02-instruct': {
                 dimension: 1024,
                 contextLength: 4000,
-                description: 'Legacy model'
-            }
+                description: 'Legacy model',
+            },
         };
     }
-} 
+}

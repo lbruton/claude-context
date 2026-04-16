@@ -53,7 +53,11 @@ export interface VectorDatabase {
      * @param dimension Vector dimension
      * @param description Collection description
      */
-    createCollection(collectionName: string, dimension: number, description?: string): Promise<void>;
+    createCollection(
+        collectionName: string,
+        dimension: number,
+        description?: string,
+    ): Promise<void>;
 
     /**
      * Create collection with hybrid search support
@@ -61,7 +65,11 @@ export interface VectorDatabase {
      * @param dimension Dense vector dimension
      * @param description Collection description
      */
-    createHybridCollection(collectionName: string, dimension: number, description?: string): Promise<void>;
+    createHybridCollection(
+        collectionName: string,
+        dimension: number,
+        description?: string,
+    ): Promise<void>;
 
     /**
      * Drop collection
@@ -100,7 +108,11 @@ export interface VectorDatabase {
      * @param queryVector Query vector
      * @param options Search options
      */
-    search(collectionName: string, queryVector: number[], options?: SearchOptions): Promise<VectorSearchResult[]>;
+    search(
+        collectionName: string,
+        queryVector: number[],
+        options?: SearchOptions,
+    ): Promise<VectorSearchResult[]>;
 
     /**
      * Hybrid search with multiple vector fields
@@ -108,7 +120,11 @@ export interface VectorDatabase {
      * @param searchRequests Array of search requests for different fields
      * @param options Hybrid search options including reranking
      */
-    hybridSearch(collectionName: string, searchRequests: HybridSearchRequest[], options?: HybridSearchOptions): Promise<HybridSearchResult[]>;
+    hybridSearch(
+        collectionName: string,
+        searchRequests: HybridSearchRequest[],
+        options?: HybridSearchOptions,
+    ): Promise<HybridSearchResult[]>;
 
     /**
      * Delete documents
@@ -124,7 +140,12 @@ export interface VectorDatabase {
      * @param outputFields Fields to return
      * @param limit Maximum number of results
      */
-    query(collectionName: string, filter: string, outputFields: string[], limit?: number): Promise<Record<string, any>[]>;
+    query(
+        collectionName: string,
+        filter: string,
+        outputFields: string[],
+        limit?: number,
+    ): Promise<Record<string, any>[]>;
 
     /**
      * Get collection description
@@ -149,4 +170,5 @@ export interface VectorDatabase {
  * Special error message for collection limit exceeded
  * This allows us to distinguish it from other errors across all Milvus implementations
  */
-export const COLLECTION_LIMIT_MESSAGE = "[Error]: Your Milvus instance has hit its collection limit. Drop unused collections or increase the limit in your Milvus configuration."; 
+export const COLLECTION_LIMIT_MESSAGE =
+    '[Error]: Your Milvus instance has hit its collection limit. Drop unused collections or increase the limit in your Milvus configuration.';

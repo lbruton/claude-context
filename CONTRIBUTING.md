@@ -14,46 +14,46 @@ Thank you for your interest in contributing to Claude Context! This guide will h
 
 1. **Fork and Clone**
 
-   ```bash
-   git clone https://github.com/your-username/claude-context.git
-   cd claude-context
-   ```
+    ```bash
+    git clone https://github.com/your-username/claude-context.git
+    cd claude-context
+    ```
 
 2. **Platform-Specific Setup**
 
-   **Windows Users:**
+    **Windows Users:**
 
-   ```powershell
-   # Configure git line endings (recommended)
-   git config core.autocrlf false
+    ```powershell
+    # Configure git line endings (recommended)
+    git config core.autocrlf false
 
-   # Ensure pnpm is installed
-   npm install -g pnpm
-   ```
+    # Ensure pnpm is installed
+    npm install -g pnpm
+    ```
 
-   **Linux/macOS Users:**
+    **Linux/macOS Users:**
 
-   ```bash
-   # Standard setup - no additional configuration needed
-   ```
+    ```bash
+    # Standard setup - no additional configuration needed
+    ```
 
 3. **Install Dependencies**
 
-   ```bash
-   pnpm install
-   ```
+    ```bash
+    pnpm install
+    ```
 
 4. **Build All Packages**
 
-   ```bash
-   pnpm build
-   ```
+    ```bash
+    pnpm build
+    ```
 
 5. **Start Development Mode**
 
-   ```bash
-   pnpm dev
-   ```
+    ```bash
+    pnpm dev
+    ```
 
 ## 📁 Project Structure
 
@@ -64,7 +64,7 @@ claude-context/
 │   ├── vscode-extension/  # VSCode extension
 │   └── mcp/              # Model Context Protocol server
 ├── examples/
-│   └── basic-usage/      # Basic usage example 
+│   └── basic-usage/      # Basic usage example
 ```
 
 ### Package-Specific Development
@@ -121,32 +121,32 @@ refactor(mcp): improve error handling
 
 1. **Create Feature Branch**
 
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
 
 2. **Make Your Changes**
-   - Keep changes focused and atomic
-   - Update documentation if needed
+    - Keep changes focused and atomic
+    - Update documentation if needed
 
 3. **Build and Verify**
 
-   ```bash
-   pnpm build
-   ```
+    ```bash
+    pnpm build
+    ```
 
 4. **Commit Your Changes**
 
-   ```bash
-   git add .
-   git commit -m "feat(core): add your feature description"
-   ```
+    ```bash
+    git add .
+    git commit -m "feat(core): add your feature description"
+    ```
 
 5. **Push and Create PR**
 
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+    ```bash
+    git push origin feature/your-feature-name
+    ```
 
 ## 🎯 Contribution Areas
 

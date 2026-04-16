@@ -82,7 +82,6 @@ export class EnvManager {
             }
 
             fs.writeFileSync(this.envFilePath, content, 'utf-8');
-
         } catch (error) {
             console.error(`[EnvManager] ❌ Failed to write env file: ${error}`);
             throw error;
@@ -98,4 +97,4 @@ export class EnvManager {
 }
 
 // Export a default instance for convenience
-export const envManager = new EnvManager(); 
+export const envManager = new EnvManager();

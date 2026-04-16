@@ -21,8 +21,8 @@ export class GeminiEmbedding extends Embedding {
             apiKey: config.apiKey,
             ...(config.baseURL && {
                 httpOptions: {
-                    baseUrl: config.baseURL
-                }
+                    baseUrl: config.baseURL,
+                },
             }),
         });
 
@@ -73,10 +73,12 @@ export class GeminiEmbedding extends Embedding {
 
             return {
                 vector: response.embeddings[0].values,
-                dimension: response.embeddings[0].values.length
+                dimension: response.embeddings[0].values.length,
             };
         } catch (error) {
-            throw new Error(`Gemini embedding failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            throw new Error(
+                `Gemini embedding failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            );
         }
     }
 
@@ -103,11 +105,13 @@ export class GeminiEmbedding extends Embedding {
                 }
                 return {
                     vector: embedding.values,
-                    dimension: embedding.values.length
+                    dimension: embedding.values.length,
                 };
             });
         } catch (error) {
-            throw new Error(`Gemini batch embedding failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            throw new Error(
+                `Gemini batch embedding failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            );
         }
     }
 
@@ -147,14 +151,23 @@ export class GeminiEmbedding extends Embedding {
     /**
      * Get list of supported models
      */
-    static getSupportedModels(): Record<string, { dimension: number; contextLength: number; description: string; supportedDimensions?: number[] }> {
+    static getSupportedModels(): Record<
+        string,
+        {
+            dimension: number;
+            contextLength: number;
+            description: string;
+            supportedDimensions?: number[];
+        }
+    > {
         return {
             'gemini-embedding-001': {
                 dimension: 3072,
                 contextLength: 2048,
-                description: 'Latest Gemini embedding model with state-of-the-art performance (recommended)',
-                supportedDimensions: [3072, 1536, 768, 256] // Matryoshka Representation Learning support
-            }
+                description:
+                    'Latest Gemini embedding model with state-of-the-art performance (recommended)',
+                supportedDimensions: [3072, 1536, 768, 256], // Matryoshka Representation Learning support
+            },
         };
     }
 
@@ -162,7 +175,8 @@ export class GeminiEmbedding extends Embedding {
      * Get supported dimensions for the current model
      */
     getSupportedDimensions(): number[] {
-        const modelInfo = GeminiEmbedding.getSupportedModels()[this.config.model || 'gemini-embedding-001'];
+        const modelInfo =
+            GeminiEmbedding.getSupportedModels()[this.config.model || 'gemini-embedding-001'];
         return modelInfo?.supportedDimensions || [this.dimension];
     }
 
