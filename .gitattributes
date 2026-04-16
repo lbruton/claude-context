@@ -1,0 +1,11 @@
+# Auto-detect text files and normalise line endings
+* text=auto
+
+# Export ignore — excluded from `git archive`
+.husky/           export-ignore
+.prettierrc       export-ignore
+.prettierignore   export-ignore
+.gitattributes    export-ignore
+.pre-commit-config.yaml export-ignore
+.claude/          export-ignore
+CLAUDE.md         export-ignore
