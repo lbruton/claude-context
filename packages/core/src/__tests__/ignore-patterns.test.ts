@@ -1,11 +1,14 @@
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import ignore from 'ignore';
 import { Context } from '../context';
 
 describe('getIgnorePatternsFromFile', () => {
-    const tmpDir = '/tmp/claude-context-test-ignore';
-    const fs = require('fs');
+    let tmpDir: string;
 
     beforeEach(() => {
-        fs.mkdirSync(tmpDir, { recursive: true });
+        tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-context-test-'));
     });
 
     afterEach(() => {
@@ -36,7 +39,6 @@ describe('getIgnorePatternsFromFile', () => {
 
 describe('ignore matcher with negation', () => {
     it('negation pattern re-includes previously ignored files', () => {
-        const ignore = require('ignore');
         const ig = ignore();
         ig.add(['*.log', '!important.log', 'node_modules']);
 
@@ -47,7 +49,6 @@ describe('ignore matcher with negation', () => {
     });
 
     it('negation ordering matters — last match wins', () => {
-        const ignore = require('ignore');
         const ig = ignore();
         ig.add(['*.log', '!important.log', 'important.log']);
 

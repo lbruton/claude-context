@@ -95,15 +95,11 @@ const DEFAULT_IGNORE_PATTERNS = [
     '*.runtime.js',
     '*.map', // source map files
     'node_modules',
-    '.git',
-    '.svn',
-    '.hg',
+    '.*',
     'build',
     'dist',
     'out',
     'target',
-    '.vscode',
-    '.idea',
     '__pycache__',
     '.pytest_cache',
     'coverage',
@@ -169,15 +165,12 @@ export class Context {
         // Load custom ignore patterns from environment variables
         const envCustomIgnorePatterns = this.getCustomIgnorePatternsFromEnv();
 
-        // Start with default ignore patterns
-        const allIgnorePatterns = [
+        this.ignorePatterns = [
             ...DEFAULT_IGNORE_PATTERNS,
             ...(config.ignorePatterns || []),
             ...(config.customIgnorePatterns || []),
             ...envCustomIgnorePatterns,
         ];
-        // Remove duplicates
-        this.ignorePatterns = [...new Set(allIgnorePatterns)];
         this.ignoreMatcher = this.buildIgnoreMatcher();
 
         console.log(
@@ -703,11 +696,7 @@ export class Context {
      * @param ignorePatterns Array of ignore patterns to add to defaults
      */
     updateIgnorePatterns(ignorePatterns: string[]): void {
-        const mergedPatterns = [...DEFAULT_IGNORE_PATTERNS, ...ignorePatterns];
-        const uniquePatterns: string[] = [];
-        const patternSet = new Set(mergedPatterns);
-        patternSet.forEach((pattern) => uniquePatterns.push(pattern));
-        this.ignorePatterns = uniquePatterns;
+        this.ignorePatterns = [...DEFAULT_IGNORE_PATTERNS, ...ignorePatterns];
         this.ignoreMatcher = this.buildIgnoreMatcher();
         console.log(
             `[Context] 🚫 Updated ignore patterns: ${ignorePatterns.length} new + ${DEFAULT_IGNORE_PATTERNS.length} default = ${this.ignorePatterns.length} total patterns`,
@@ -721,11 +710,7 @@ export class Context {
     addCustomIgnorePatterns(customPatterns: string[]): void {
         if (customPatterns.length === 0) return;
 
-        const mergedPatterns = [...this.ignorePatterns, ...customPatterns];
-        const uniquePatterns: string[] = [];
-        const patternSet = new Set(mergedPatterns);
-        patternSet.forEach((pattern) => uniquePatterns.push(pattern));
-        this.ignorePatterns = uniquePatterns;
+        this.ignorePatterns = [...this.ignorePatterns, ...customPatterns];
         this.ignoreMatcher = this.buildIgnoreMatcher();
         console.log(
             `[Context] 🚫 Added ${customPatterns.length} custom ignore patterns. Total: ${this.ignorePatterns.length} patterns`,
@@ -840,8 +825,7 @@ export class Context {
             for (const entry of entries) {
                 const fullPath = path.join(currentPath, entry.name);
 
-                // Check if path matches ignore patterns
-                if (this.matchesIgnorePattern(fullPath, codebasePath)) {
+                if (this.matchesIgnorePattern(fullPath, codebasePath, entry.isDirectory())) {
                     continue;
                 }
 
@@ -1272,13 +1256,13 @@ export class Context {
         }
     }
 
-    private matchesIgnorePattern(filePath: string, basePath: string): boolean {
+    private matchesIgnorePattern(filePath: string, basePath: string, isDirectory = false): boolean {
         const relativePath = path.relative(basePath, filePath);
         const normalizedPath = relativePath.replace(/\\/g, '/');
         if (!normalizedPath || normalizedPath === '.') {
             return false;
         }
-        return this.ignoreMatcher.ignores(normalizedPath);
+        return this.ignoreMatcher.ignores(isDirectory ? normalizedPath + '/' : normalizedPath);
     }
 
     /**

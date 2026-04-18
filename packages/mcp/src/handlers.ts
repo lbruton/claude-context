@@ -431,7 +431,7 @@ export class ToolHandlers {
             // Initialize file synchronizer with the compiled ignore matcher
             const { FileSynchronizer } = await import('@lbruton/claude-context-core');
             const ignoreMatcher = this.context.getIgnoreMatcher();
-            console.log(
+            console.warn(
                 `[BACKGROUND-INDEX] Using ignore patterns: ${(this.context.getIgnorePatterns() || []).join(', ')}`,
             );
             const synchronizer = new FileSynchronizer(absolutePath, ignoreMatcher);

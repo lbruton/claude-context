@@ -43,7 +43,6 @@ reviews:
         - '!**/.agents/**'
         - '!**/.spec-workflow/**'
         - '!**/.codacy/**'
-        - '!**/.github/**'
         - '!**/vendor/**'
         - '!**/deprecated/**'
         - '!**/*.min.js'
@@ -93,8 +92,6 @@ reviews:
     finishing_touches:
         docstrings:
             enabled: false
-        autofix:
-            enabled: true
 
     # Static analysis tools
     tools:
@@ -114,7 +111,7 @@ reviews:
 # Knowledge base — learn from feedback over time
 knowledge_base:
     learnings:
-        enabled: true
+        scope: 'auto'
 
 # Chat — allow @coderabbitai interactions in PR comments
 chat:

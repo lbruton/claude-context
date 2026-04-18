@@ -55,8 +55,7 @@ export class FileSynchronizer {
             const fullPath = path.join(dir, entry.name);
             const relativePath = path.relative(this.rootDir, fullPath);
 
-            // Check if this path should be ignored BEFORE any file system operations
-            if (this.shouldIgnore(relativePath)) {
+            if (this.shouldIgnore(relativePath, entry.isDirectory())) {
                 continue; // Skip completely - no access at all
             }
 
@@ -70,7 +69,7 @@ export class FileSynchronizer {
             }
 
             if (stat.isDirectory()) {
-                if (!this.shouldIgnore(relativePath)) {
+                if (!this.shouldIgnore(relativePath, true)) {
                     const subHashes = await this.generateFileHashes(fullPath);
                     const entries = Array.from(subHashes.entries());
                     for (let i = 0; i < entries.length; i++) {
@@ -79,7 +78,7 @@ export class FileSynchronizer {
                     }
                 }
             } else if (stat.isFile()) {
-                if (!this.shouldIgnore(relativePath)) {
+                if (!this.shouldIgnore(relativePath, false)) {
                     try {
                         const hash = await this.hashFile(fullPath);
                         fileHashes.set(relativePath, hash);
@@ -96,12 +95,12 @@ export class FileSynchronizer {
         return fileHashes;
     }
 
-    private shouldIgnore(relativePath: string): boolean {
+    private shouldIgnore(relativePath: string, isDirectory = false): boolean {
         const normalizedPath = relativePath.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
         if (!normalizedPath || normalizedPath === '.') {
             return false;
         }
-        return this.ignoreMatcher.ignores(normalizedPath);
+        return this.ignoreMatcher.ignores(isDirectory ? normalizedPath + '/' : normalizedPath);
     }
 
     private buildMerkleDAG(fileHashes: Map<string, string>): MerkleDAG {
