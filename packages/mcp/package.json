@@ -15,7 +15,8 @@
         "typecheck": "tsc --noEmit",
         "start": "tsx src/index.ts",
         "start:with-env": "OPENAI_API_KEY=${OPENAI_API_KEY:your-api-key-here} MILVUS_ADDRESS=${MILVUS_ADDRESS:localhost:19530} tsx src/index.ts",
-        "prepublishOnly": "pnpm build"
+        "prepublishOnly": "pnpm build",
+        "test": "jest"
     },
     "dependencies": {
         "@lbruton/claude-context-core": "workspace:*",
@@ -23,7 +24,10 @@
         "zod": "^3.25.76"
     },
     "devDependencies": {
+        "@types/jest": "^30.0.0",
         "@types/node": "^20.19.37",
+        "jest": "^30.3.0",
+        "ts-jest": "^29.4.6",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
     },

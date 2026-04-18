@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "outDir": "./dist-test",
+        "rootDir": "./src"
+    },
+    "include": ["src/**/*"],
+    "exclude": ["dist", "dist-test", "node_modules"]
+}
