@@ -3,20 +3,21 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { MerkleDAG } from './merkle';
 import * as os from 'os';
+import ignore, { Ignore } from 'ignore';
 
 export class FileSynchronizer {
     private fileHashes: Map<string, string>;
     private merkleDAG: MerkleDAG;
     private rootDir: string;
     private snapshotPath: string;
-    private ignorePatterns: string[];
+    private ignoreMatcher: Ignore;
 
-    constructor(rootDir: string, ignorePatterns: string[] = []) {
+    constructor(rootDir: string, ignoreMatcher?: Ignore) {
         this.rootDir = rootDir;
         this.snapshotPath = this.getSnapshotPath(rootDir);
         this.fileHashes = new Map();
         this.merkleDAG = new MerkleDAG();
-        this.ignorePatterns = ignorePatterns;
+        this.ignoreMatcher = ignoreMatcher || ignore();
     }
 
     private getSnapshotPath(codebasePath: string): string {
@@ -55,7 +56,7 @@ export class FileSynchronizer {
             const relativePath = path.relative(this.rootDir, fullPath);
 
             // Check if this path should be ignored BEFORE any file system operations
-            if (this.shouldIgnore(relativePath, entry.isDirectory())) {
+            if (this.shouldIgnore(relativePath)) {
                 continue; // Skip completely - no access at all
             }
 
@@ -69,8 +70,7 @@ export class FileSynchronizer {
             }
 
             if (stat.isDirectory()) {
-                // Verify it's really a directory and not ignored
-                if (!this.shouldIgnore(relativePath, true)) {
+                if (!this.shouldIgnore(relativePath)) {
                     const subHashes = await this.generateFileHashes(fullPath);
                     const entries = Array.from(subHashes.entries());
                     for (let i = 0; i < entries.length; i++) {
@@ -79,8 +79,7 @@ export class FileSynchronizer {
                     }
                 }
             } else if (stat.isFile()) {
-                // Verify it's really a file and not ignored
-                if (!this.shouldIgnore(relativePath, false)) {
+                if (!this.shouldIgnore(relativePath)) {
                     try {
                         const hash = await this.hashFile(fullPath);
                         fileHashes.set(relativePath, hash);
@@ -97,105 +96,12 @@ export class FileSynchronizer {
         return fileHashes;
     }
 
-    private shouldIgnore(relativePath: string, isDirectory: boolean = false): boolean {
-        // Always ignore hidden files and directories (starting with .)
-        const pathParts = relativePath.split(path.sep);
-        if (pathParts.some((part) => part.startsWith('.'))) {
-            return true;
-        }
-
-        if (this.ignorePatterns.length === 0) {
-            return false;
-        }
-
-        // Normalize path separators and remove leading/trailing slashes
+    private shouldIgnore(relativePath: string): boolean {
         const normalizedPath = relativePath.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
-
-        if (!normalizedPath) {
-            return false; // Don't ignore root
-        }
-
-        // Check direct pattern matches first
-        for (const pattern of this.ignorePatterns) {
-            if (this.matchPattern(normalizedPath, pattern, isDirectory)) {
-                return true;
-            }
-        }
-
-        // Check if any parent directory is ignored
-        const normalizedPathParts = normalizedPath.split('/');
-        for (let i = 0; i < normalizedPathParts.length; i++) {
-            const partialPath = normalizedPathParts.slice(0, i + 1).join('/');
-            for (const pattern of this.ignorePatterns) {
-                // Check directory patterns
-                if (pattern.endsWith('/')) {
-                    const dirPattern = pattern.slice(0, -1);
-                    if (
-                        this.simpleGlobMatch(partialPath, dirPattern) ||
-                        this.simpleGlobMatch(normalizedPathParts[i], dirPattern)
-                    ) {
-                        return true;
-                    }
-                }
-                // Check exact path patterns
-                else if (pattern.includes('/')) {
-                    if (this.simpleGlobMatch(partialPath, pattern)) {
-                        return true;
-                    }
-                }
-                // Check filename patterns against any path component
-                else {
-                    if (this.simpleGlobMatch(normalizedPathParts[i], pattern)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private matchPattern(filePath: string, pattern: string, isDirectory: boolean = false): boolean {
-        // Clean both path and pattern
-        const cleanPath = filePath.replace(/^\/+|\/+$/g, '');
-        const cleanPattern = pattern.replace(/^\/+|\/+$/g, '');
-
-        if (!cleanPath || !cleanPattern) {
+        if (!normalizedPath || normalizedPath === '.') {
             return false;
         }
-
-        // Handle directory patterns (ending with /)
-        if (pattern.endsWith('/')) {
-            if (!isDirectory) return false; // Directory pattern only matches directories
-            const dirPattern = cleanPattern.slice(0, -1);
-
-            // Direct match or any path component matches
-            return (
-                this.simpleGlobMatch(cleanPath, dirPattern) ||
-                cleanPath.split('/').some((part) => this.simpleGlobMatch(part, dirPattern))
-            );
-        }
-
-        // Handle path patterns (containing /)
-        if (cleanPattern.includes('/')) {
-            return this.simpleGlobMatch(cleanPath, cleanPattern);
-        }
-
-        // Handle filename patterns (no /) - match against basename
-        const fileName = path.basename(cleanPath);
-        return this.simpleGlobMatch(fileName, cleanPattern);
-    }
-
-    private simpleGlobMatch(text: string, pattern: string): boolean {
-        if (!text || !pattern) return false;
-
-        // Convert glob pattern to regex
-        const regexPattern = pattern
-            .replace(/[.+^${}()|[\]\\]/g, '\\$&') // Escape regex special chars except *
-            .replace(/\*/g, '.*'); // Convert * to .*
-
-        const regex = new RegExp(`^${regexPattern}$`);
-        return regex.test(text);
+        return this.ignoreMatcher.ignores(normalizedPath);
     }
 
     private buildMerkleDAG(fileHashes: Map<string, string>): MerkleDAG {
