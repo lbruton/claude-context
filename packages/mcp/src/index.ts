@@ -79,9 +79,6 @@ class ContextMcpServer {
         this.syncManager = new SyncManager(this.context, this.snapshotManager);
         this.toolHandlers = new ToolHandlers(this.context, this.snapshotManager);
 
-        // Load existing codebase snapshot on startup
-        this.snapshotManager.loadCodebaseSnapshot();
-
         this.setupTools();
     }
 
@@ -253,6 +250,9 @@ This tool is versatile and can be used before completing various tasks to retrie
     }
 
     async start() {
+        // Load snapshot before accepting connections (async due to lock)
+        await this.snapshotManager.loadCodebaseSnapshot();
+
         // Verify Milvus connection before accepting MCP clients
         console.log('[MCP] Verifying Milvus connection...');
         try {
@@ -270,9 +270,16 @@ This tool is versatile and can be used before completing various tasks to retrie
         // Start background sync after server is connected
         this.syncManager.startBackgroundSync();
     }
+
+    dispose(): void {
+        this.syncManager.dispose();
+        console.log('[MCP] Server disposed');
+    }
 }
 
 // Main execution
+let serverInstance: ContextMcpServer | null = null;
+
 async function main() {
     // Parse command line arguments
     const args = process.argv.slice(2);
@@ -287,20 +294,20 @@ async function main() {
     const config = createMcpConfig();
     logConfigurationSummary(config);
 
-    const server = new ContextMcpServer(config);
-    await server.start();
+    serverInstance = new ContextMcpServer(config);
+    await serverInstance.start();
 }
 
-// Handle graceful shutdown
-process.on('SIGINT', () => {
-    console.error('Received SIGINT, shutting down gracefully...');
+function shutdown(signal: string): void {
+    console.error(`Received ${signal}, shutting down gracefully...`);
+    if (serverInstance) {
+        serverInstance.dispose();
+    }
     process.exit(0);
-});
+}
 
-process.on('SIGTERM', () => {
-    console.error('Received SIGTERM, shutting down gracefully...');
-    process.exit(0);
-});
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
 
 // Always start the server - this is designed to be the main entry point
 main().catch((error) => {

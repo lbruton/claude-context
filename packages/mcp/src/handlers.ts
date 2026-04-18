@@ -141,7 +141,7 @@ export class ToolHandlers {
             }
 
             if (hasChanges) {
-                this.snapshotManager.saveCodebaseSnapshot();
+                await this.snapshotManager.saveCodebaseSnapshot();
             }
 
             const finalSnapshotCount = this.snapshotManager.getIndexedCodebases().length;
@@ -217,7 +217,7 @@ export class ToolHandlers {
                         `[FORCE-REINDEX] Clearing stale indexing state for '${absolutePath}'`,
                     );
                     this.snapshotManager.removeCodebaseCompletely(absolutePath);
-                    this.snapshotManager.saveCodebaseSnapshot();
+                    await this.snapshotManager.saveCodebaseSnapshot();
                 } else {
                     return {
                         content: [
@@ -246,13 +246,13 @@ export class ToolHandlers {
                         totalChunks: 0,
                         status: 'completed' as const,
                     });
-                    this.snapshotManager.saveCodebaseSnapshot();
+                    await this.snapshotManager.saveCodebaseSnapshot();
                 } else if (!vectorDbHasIndex && snapshotHasIndex) {
                     console.warn(
                         `[INDEX-VALIDATION] Clearing stale snapshot for '${absolutePath}'`,
                     );
                     this.snapshotManager.removeCodebaseCompletely(absolutePath);
-                    this.snapshotManager.saveCodebaseSnapshot();
+                    await this.snapshotManager.saveCodebaseSnapshot();
                 }
             }
 
@@ -275,7 +275,7 @@ export class ToolHandlers {
             // If force reindex and codebase is already indexed, remove it
             if (forceReindex) {
                 this.snapshotManager.removeCodebaseCompletely(absolutePath);
-                this.snapshotManager.saveCodebaseSnapshot();
+                await this.snapshotManager.saveCodebaseSnapshot();
                 if (await this.context.hasIndex(absolutePath)) {
                     console.log(`[FORCE-REINDEX] 🔄 Clearing index for '${absolutePath}'`);
                     await this.context.clearIndex(absolutePath);
@@ -351,7 +351,7 @@ export class ToolHandlers {
 
             // Set to indexing status and save snapshot immediately
             this.snapshotManager.setCodebaseIndexing(absolutePath, 0);
-            this.snapshotManager.saveCodebaseSnapshot();
+            await this.snapshotManager.saveCodebaseSnapshot();
 
             // Track the codebase path for syncing
             trackCodebasePath(absolutePath);
@@ -464,8 +464,12 @@ export class ToolHandlers {
                 // Save snapshot periodically (every 2 seconds to avoid too frequent saves)
                 const currentTime = Date.now();
                 if (currentTime - lastSaveTime >= 2000) {
-                    // 2 seconds = 2000ms
-                    this.snapshotManager.saveCodebaseSnapshot();
+                    // Fire-and-forget: progress saves are best-effort
+                    this.snapshotManager
+                        .saveCodebaseSnapshot()
+                        .catch((err) =>
+                            console.error('[BACKGROUND-INDEX] Progress snapshot save failed:', err),
+                        );
                     lastSaveTime = currentTime;
                     console.log(
                         `[BACKGROUND-INDEX] 💾 Saved progress snapshot at ${progress.percentage.toFixed(1)}%`,
@@ -488,7 +492,7 @@ export class ToolHandlers {
             };
 
             // Save snapshot after updating codebase lists
-            this.snapshotManager.saveCodebaseSnapshot();
+            await this.snapshotManager.saveCodebaseSnapshot();
 
             let message = `Background indexing completed for '${absolutePath}' using ${splitterType.toUpperCase()} splitter.\nIndexed ${stats.indexedFiles} files, ${stats.totalChunks} chunks.`;
             if (stats.status === 'limit_reached') {
@@ -505,7 +509,7 @@ export class ToolHandlers {
             // Set codebase to failed status with error information
             const errorMessage = error.message || String(error);
             this.snapshotManager.setCodebaseIndexFailed(absolutePath, errorMessage, lastProgress);
-            this.snapshotManager.saveCodebaseSnapshot();
+            await this.snapshotManager.saveCodebaseSnapshot();
 
             // Log error but don't crash MCP service - indexing errors are handled gracefully
             console.error(
@@ -567,7 +571,7 @@ export class ToolHandlers {
                         totalChunks: 0,
                         status: 'completed' as const,
                     });
-                    this.snapshotManager.saveCodebaseSnapshot();
+                    await this.snapshotManager.saveCodebaseSnapshot();
                     // Continue with search (don't return error)
                 } else {
                     return {
@@ -831,7 +835,7 @@ export class ToolHandlers {
             this.indexingStats = null;
 
             // Save snapshot after clearing index
-            this.snapshotManager.saveCodebaseSnapshot();
+            await this.snapshotManager.saveCodebaseSnapshot();
 
             let resultText = `Successfully cleared codebase '${absolutePath}'`;
 

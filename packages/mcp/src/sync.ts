@@ -6,6 +6,8 @@ export class SyncManager {
     private context: Context;
     private snapshotManager: SnapshotManager;
     private isSyncing: boolean = false;
+    private syncIntervalId: ReturnType<typeof setInterval> | null = null;
+    private initialSyncTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
     constructor(context: Context, snapshotManager: SnapshotManager) {
         this.context = context;
@@ -143,7 +145,8 @@ export class SyncManager {
 
         // Execute initial sync immediately after a short delay to let server initialize
         console.log('[SYNC-DEBUG] Scheduling initial sync in 5 seconds...');
-        setTimeout(async () => {
+        this.initialSyncTimeoutId = setTimeout(async () => {
+            this.initialSyncTimeoutId = null;
             console.log('[SYNC-DEBUG] Executing initial sync after server startup');
             try {
                 await this.handleSyncIndex();
@@ -158,18 +161,30 @@ export class SyncManager {
                     throw error;
                 }
             }
-        }, 5000); // Initial sync after 5 seconds
+        }, 5000);
 
         // Periodically check for file changes and update the index
         console.log('[SYNC-DEBUG] Setting up periodic sync every 5 minutes (300000ms)');
-        const syncInterval = setInterval(
+        this.syncIntervalId = setInterval(
             () => {
                 console.log('[SYNC-DEBUG] Executing scheduled periodic sync');
                 this.handleSyncIndex();
             },
             5 * 60 * 1000,
-        ); // every 5 minutes
+        );
 
-        console.log('[SYNC-DEBUG] Background sync setup complete. Interval ID:', syncInterval);
+        console.log('[SYNC-DEBUG] Background sync setup complete');
+    }
+
+    public dispose(): void {
+        if (this.syncIntervalId !== null) {
+            clearInterval(this.syncIntervalId);
+            this.syncIntervalId = null;
+        }
+        if (this.initialSyncTimeoutId !== null) {
+            clearTimeout(this.initialSyncTimeoutId);
+            this.initialSyncTimeoutId = null;
+        }
+        console.log('[SYNC] Background sync disposed');
     }
 }

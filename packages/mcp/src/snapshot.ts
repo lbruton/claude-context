@@ -473,7 +473,7 @@ export class SnapshotManager {
         console.log(`[SNAPSHOT-DEBUG] Completely removed codebase from snapshot: ${codebasePath}`);
     }
 
-    public loadCodebaseSnapshot(): void {
+    public async loadCodebaseSnapshot(): Promise<void> {
         console.log('[SNAPSHOT-DEBUG] Loading codebase snapshot from:', this.snapshotFilePath);
 
         try {
@@ -496,7 +496,7 @@ export class SnapshotManager {
             }
 
             // Always save in v2 format after loading (migration)
-            this.saveCodebaseSnapshot();
+            await this.saveCodebaseSnapshot();
         } catch (error: any) {
             console.error('[SNAPSHOT-DEBUG] Error loading snapshot:', error);
             console.log(
@@ -505,28 +505,24 @@ export class SnapshotManager {
         }
     }
 
-    private acquireLock(maxRetries = 5, retryInterval = 100): boolean {
+    private async acquireLock(maxRetries = 5, retryInterval = 100): Promise<boolean> {
         const lockPath = this.snapshotFilePath + '.lock';
         for (let i = 0; i < maxRetries; i++) {
             try {
                 fs.mkdirSync(lockPath);
                 return true;
             } catch {
-                // Check for stale lock (> 10 seconds old)
                 try {
                     const stat = fs.statSync(lockPath);
                     if (Date.now() - stat.mtimeMs > 10000) {
                         fs.rmdirSync(lockPath);
-                        continue; // retry after removing stale lock
+                        continue;
                     }
                 } catch {
                     /* lock was removed by another process */
                 }
-                // Busy wait and retry
-                const waitUntil = Date.now() + retryInterval;
-                while (Date.now() < waitUntil) {
-                    /* busy wait */
-                }
+                const backoff = retryInterval * Math.pow(2, i);
+                await new Promise<void>((resolve) => setTimeout(resolve, backoff));
             }
         }
         return false;
@@ -559,10 +555,10 @@ export class SnapshotManager {
         // indexfailed entries only need codebaseInfoMap, no extra list
     }
 
-    public saveCodebaseSnapshot(): void {
+    public async saveCodebaseSnapshot(): Promise<void> {
         console.log('[SNAPSHOT-DEBUG] Saving codebase snapshot to:', this.snapshotFilePath);
 
-        const locked = this.acquireLock();
+        const locked = await this.acquireLock();
         if (!locked) {
             console.warn('[SNAPSHOT-DEBUG] Failed to acquire lock, saving without lock');
         }
