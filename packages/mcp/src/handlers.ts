@@ -428,11 +428,13 @@ export class ToolHandlers {
             // Load ignore patterns from files first (including .ignore, .gitignore, etc.)
             await this.context.getLoadedIgnorePatterns(absolutePath);
 
-            // Initialize file synchronizer with proper ignore patterns (including project-specific patterns)
+            // Initialize file synchronizer with the compiled ignore matcher
             const { FileSynchronizer } = await import('@lbruton/claude-context-core');
-            const ignorePatterns = this.context.getIgnorePatterns() || [];
-            console.log(`[BACKGROUND-INDEX] Using ignore patterns: ${ignorePatterns.join(', ')}`);
-            const synchronizer = new FileSynchronizer(absolutePath, ignorePatterns);
+            const ignoreMatcher = this.context.getIgnoreMatcher();
+            console.warn(
+                `[BACKGROUND-INDEX] Using ignore patterns: ${(this.context.getIgnorePatterns() || []).join(', ')}`,
+            );
+            const synchronizer = new FileSynchronizer(absolutePath, ignoreMatcher);
             await synchronizer.initialize();
 
             // Store synchronizer in the context (let context manage collection names)

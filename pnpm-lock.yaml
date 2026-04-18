@@ -83,6 +83,9 @@ importers:
       glob:
         specifier: ^10.5.0
         version: 10.5.0
+      ignore:
+        specifier: ^7.0.5
+        version: 7.0.5
       langchain:
         specifier: ^0.3.37
         version: 0.3.37(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@5.23.2(ws@5.2.4)(zod@3.25.76))(ws@5.2.4))(@opentelemetry/api@1.9.1)(cheerio@1.0.0)(handlebars@4.7.9)(openai@5.23.2(ws@5.2.4)(zod@3.25.76))(ws@5.2.4)

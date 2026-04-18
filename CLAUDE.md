@@ -19,7 +19,7 @@ This repository started as a fork of `zilliztech/claude-context`, but it is now 
 - `origin` is the source of truth for all PR work: `lbruton/claude-context`
 - `upstream` may still exist as a remote for occasional reference/contribution history
 - Do not treat upstream PRs/issues as actionable for this repo unless explicitly requested
-- For PR operations (especially `/pr-resolve`), always scope GitHub commands to `-R lbruton/claude-context`
+- For PR operations (especially `/pr-resolve`), always scope GitHub calls to `owner: "lbruton"`, `repo: "claude-context"` via `mcp__github__*` tools (per user-level CLAUDE.md "GitHub MCP vs `gh` CLI"). Only fall back to `gh -R lbruton/claude-context` for the MCP gaps listed there (GraphQL `resolveReviewThread`, `gh pr ready`, `gh release create`, review-thread replies).
 
 ## Build & Dev Commands
 

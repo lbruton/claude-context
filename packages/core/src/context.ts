@@ -14,6 +14,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { FileSynchronizer } from './sync/synchronizer';
+import ignore, { Ignore } from 'ignore';
 
 const DEFAULT_SUPPORTED_EXTENSIONS = [
     // Programming languages
@@ -94,15 +95,11 @@ const DEFAULT_IGNORE_PATTERNS = [
     '*.runtime.js',
     '*.map', // source map files
     'node_modules',
-    '.git',
-    '.svn',
-    '.hg',
+    '.*',
     'build',
     'dist',
     'out',
     'target',
-    '.vscode',
-    '.idea',
     '__pycache__',
     '.pytest_cache',
     'coverage',
@@ -128,6 +125,7 @@ export class Context {
     private codeSplitter: Splitter;
     private supportedExtensions: string[];
     private ignorePatterns: string[];
+    private ignoreMatcher: Ignore;
     private synchronizers = new Map<string, FileSynchronizer>();
 
     constructor(config: ContextConfig = {}) {
@@ -167,15 +165,13 @@ export class Context {
         // Load custom ignore patterns from environment variables
         const envCustomIgnorePatterns = this.getCustomIgnorePatternsFromEnv();
 
-        // Start with default ignore patterns
-        const allIgnorePatterns = [
+        this.ignorePatterns = [
             ...DEFAULT_IGNORE_PATTERNS,
             ...(config.ignorePatterns || []),
             ...(config.customIgnorePatterns || []),
             ...envCustomIgnorePatterns,
         ];
-        // Remove duplicates
-        this.ignorePatterns = [...new Set(allIgnorePatterns)];
+        this.ignoreMatcher = this.buildIgnoreMatcher();
 
         console.log(
             `[Context] 🔧 Initialized with ${this.supportedExtensions.length} supported extensions and ${this.ignorePatterns.length} ignore patterns`,
@@ -225,6 +221,19 @@ export class Context {
      */
     getIgnorePatterns(): string[] {
         return [...this.ignorePatterns];
+    }
+
+    /**
+     * Get the compiled ignore matcher instance
+     */
+    getIgnoreMatcher(): Ignore {
+        return this.ignoreMatcher;
+    }
+
+    private buildIgnoreMatcher(): Ignore {
+        const ig = ignore();
+        ig.add(this.ignorePatterns);
+        return ig;
     }
 
     /**
@@ -388,7 +397,7 @@ export class Context {
             await this.loadIgnorePatterns(codebasePath);
 
             // To be safe, let's initialize if it's not there.
-            const newSynchronizer = new FileSynchronizer(codebasePath, this.ignorePatterns);
+            const newSynchronizer = new FileSynchronizer(codebasePath, this.ignoreMatcher);
             await newSynchronizer.initialize();
             this.synchronizers.set(collectionName, newSynchronizer);
         }
@@ -687,12 +696,8 @@ export class Context {
      * @param ignorePatterns Array of ignore patterns to add to defaults
      */
     updateIgnorePatterns(ignorePatterns: string[]): void {
-        // Merge with default patterns and any existing custom patterns, avoiding duplicates
-        const mergedPatterns = [...DEFAULT_IGNORE_PATTERNS, ...ignorePatterns];
-        const uniquePatterns: string[] = [];
-        const patternSet = new Set(mergedPatterns);
-        patternSet.forEach((pattern) => uniquePatterns.push(pattern));
-        this.ignorePatterns = uniquePatterns;
+        this.ignorePatterns = [...DEFAULT_IGNORE_PATTERNS, ...ignorePatterns];
+        this.ignoreMatcher = this.buildIgnoreMatcher();
         console.log(
             `[Context] 🚫 Updated ignore patterns: ${ignorePatterns.length} new + ${DEFAULT_IGNORE_PATTERNS.length} default = ${this.ignorePatterns.length} total patterns`,
         );
@@ -705,12 +710,8 @@ export class Context {
     addCustomIgnorePatterns(customPatterns: string[]): void {
         if (customPatterns.length === 0) return;
 
-        // Merge current patterns with new custom patterns, avoiding duplicates
-        const mergedPatterns = [...this.ignorePatterns, ...customPatterns];
-        const uniquePatterns: string[] = [];
-        const patternSet = new Set(mergedPatterns);
-        patternSet.forEach((pattern) => uniquePatterns.push(pattern));
-        this.ignorePatterns = uniquePatterns;
+        this.ignorePatterns = [...this.ignorePatterns, ...customPatterns];
+        this.ignoreMatcher = this.buildIgnoreMatcher();
         console.log(
             `[Context] 🚫 Added ${customPatterns.length} custom ignore patterns. Total: ${this.ignorePatterns.length} patterns`,
         );
@@ -721,6 +722,7 @@ export class Context {
      */
     resetIgnorePatternsToDefaults(): void {
         this.ignorePatterns = [...DEFAULT_IGNORE_PATTERNS];
+        this.ignoreMatcher = this.buildIgnoreMatcher();
         console.log(
             `[Context] 🔄 Reset ignore patterns to defaults: ${this.ignorePatterns.length} patterns`,
         );
@@ -823,8 +825,7 @@ export class Context {
             for (const entry of entries) {
                 const fullPath = path.join(currentPath, entry.name);
 
-                // Check if path matches ignore patterns
-                if (this.matchesIgnorePattern(fullPath, codebasePath)) {
+                if (this.matchesIgnorePattern(fullPath, codebasePath, entry.isDirectory())) {
                     continue;
                 }
 
@@ -1130,7 +1131,7 @@ export class Context {
             return content
                 .split('\n')
                 .map((line) => line.trim())
-                .filter((line) => line && !line.startsWith('#') && !line.startsWith('!')); // Filter out empty lines, comments, and negations
+                .filter((line) => line && !line.startsWith('#'));
         } catch (error) {
             console.warn(`[Context] ⚠️  Could not read ignore file ${filePath}: ${error}`);
             return [];
@@ -1255,68 +1256,13 @@ export class Context {
         }
     }
 
-    /**
-     * Check if a path matches any ignore pattern
-     * @param filePath Path to check
-     * @param basePath Base path for relative pattern matching
-     * @returns True if path should be ignored
-     */
-    private matchesIgnorePattern(filePath: string, basePath: string): boolean {
-        if (this.ignorePatterns.length === 0) {
+    private matchesIgnorePattern(filePath: string, basePath: string, isDirectory = false): boolean {
+        const relativePath = path.relative(basePath, filePath);
+        const normalizedPath = relativePath.replace(/\\/g, '/');
+        if (!normalizedPath || normalizedPath === '.') {
             return false;
         }
-
-        const relativePath = path.relative(basePath, filePath);
-        const normalizedPath = relativePath.replace(/\\/g, '/'); // Normalize path separators
-
-        for (const pattern of this.ignorePatterns) {
-            if (this.isPatternMatch(normalizedPath, pattern)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Simple glob pattern matching
-     * @param filePath File path to test
-     * @param pattern Glob pattern
-     * @returns True if pattern matches
-     */
-    private isPatternMatch(filePath: string, pattern: string): boolean {
-        // Handle directory patterns (ending with /)
-        if (pattern.endsWith('/')) {
-            const dirPattern = pattern.slice(0, -1);
-            const pathParts = filePath.split('/');
-            return pathParts.some((part) => this.simpleGlobMatch(part, dirPattern));
-        }
-
-        // Handle file patterns
-        if (pattern.includes('/')) {
-            // Pattern with path separator - match exact path
-            return this.simpleGlobMatch(filePath, pattern);
-        } else {
-            // Pattern without path separator - match filename in any directory
-            const fileName = path.basename(filePath);
-            return this.simpleGlobMatch(fileName, pattern);
-        }
-    }
-
-    /**
-     * Simple glob matching supporting * wildcard
-     * @param text Text to test
-     * @param pattern Pattern with * wildcards
-     * @returns True if pattern matches
-     */
-    private simpleGlobMatch(text: string, pattern: string): boolean {
-        // Convert glob pattern to regex
-        const regexPattern = pattern
-            .replace(/[.+^${}()|[\]\\]/g, '\\$&') // Escape regex special chars except *
-            .replace(/\*/g, '.*'); // Convert * to .*
-
-        const regex = new RegExp(`^${regexPattern}$`);
-        return regex.test(text);
+        return this.ignoreMatcher.ignores(isDirectory ? normalizedPath + '/' : normalizedPath);
     }
 
     /**
