@@ -1,6 +1,6 @@
 {
     "name": "@lbruton/claude-context-core",
-    "version": "0.1.13",
+    "version": "0.1.14",
     "description": "Core indexing engine for Claude Context",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -56,5 +56,9 @@
     "license": "MIT",
     "publishConfig": {
         "access": "public"
+    },
+    "engines": {
+        "node": ">=20",
+        "pnpm": ">=10"
     }
 }
