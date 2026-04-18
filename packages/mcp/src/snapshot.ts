@@ -543,6 +543,7 @@ export class SnapshotManager {
     private mergeExternalEntry(codebasePath: string, info: CodebaseInfo): void {
         if (this.codebaseInfoMap.has(codebasePath)) return; // we already know about it
         if (this.recentlyRemoved.has(codebasePath)) return; // explicitly removed, don't re-add from disk
+        if (!fs.existsSync(codebasePath)) return; // codebase no longer on disk, skip
         this.codebaseInfoMap.set(codebasePath, info);
         if (info.status === 'indexed') {
             if (!this.indexedCodebases.includes(codebasePath)) {

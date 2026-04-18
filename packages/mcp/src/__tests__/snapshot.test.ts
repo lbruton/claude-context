@@ -90,20 +90,17 @@ describe('SnapshotManager', () => {
         });
 
         it('throws an error when the lock cannot be acquired', async () => {
-            // Pre-create a fresh lock directory so acquireLock always sees it
-            const lockPath = snapshotFile + '.lock';
-            fs.mkdirSync(path.dirname(lockPath), { recursive: true });
-            fs.mkdirSync(lockPath);
+            // Mock acquireLock to return false immediately so the test doesn't
+            // wait for real backoff (~25.5s with maxRetries=8, retryInterval=100ms).
+            const acquireLockSpy = jest
+                .spyOn(manager as any, 'acquireLock')
+                .mockResolvedValue(false);
 
-            // Make the lock appear fresh so the stale-lock branch is not hit
-            // by touching it right now (mtime is very recent)
-            // acquireLock will exhaust its retries and return false
             await expect(manager.saveCodebaseSnapshot()).rejects.toThrow(
                 'Failed to acquire snapshot lock after retries',
             );
 
-            // Clean up lock
-            fs.rmdirSync(lockPath);
+            acquireLockSpy.mockRestore();
         });
 
         it('releases the lock after a successful save', async () => {
@@ -129,11 +126,14 @@ describe('SnapshotManager', () => {
         });
 
         it('merges entries from disk that are not in memory', async () => {
-            // Write an existing v2 snapshot on disk with an entry
+            // Create a real directory so existsSync passes in mergeExternalEntry
+            const diskOnlyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'snapshot-disk-only-'));
+
+            // Write an existing v2 snapshot on disk with an entry at a real path
             const diskEntry = {
                 formatVersion: 'v2',
                 codebases: {
-                    '/tmp/disk-only': {
+                    [diskOnlyDir]: {
                         status: 'indexed',
                         indexedFiles: 5,
                         totalChunks: 20,
@@ -145,8 +145,8 @@ describe('SnapshotManager', () => {
             };
             fs.writeFileSync(snapshotFile, JSON.stringify(diskEntry));
 
-            // In-memory manager knows about a different codebase
-            manager.setCodebaseIndexed('/tmp/mem-only', {
+            // In-memory manager knows about a different codebase (tmpDir itself)
+            manager.setCodebaseIndexed(tmpDir, {
                 indexedFiles: 3,
                 totalChunks: 9,
                 status: 'completed',
@@ -154,10 +154,13 @@ describe('SnapshotManager', () => {
 
             await manager.saveCodebaseSnapshot();
 
+            // Clean up the extra temp dir
+            fs.rmdirSync(diskOnlyDir);
+
             const data = JSON.parse(fs.readFileSync(snapshotFile, 'utf8'));
             // Both entries should be present after merge
-            expect(data.codebases['/tmp/disk-only']).toBeDefined();
-            expect(data.codebases['/tmp/mem-only']).toBeDefined();
+            expect(data.codebases[diskOnlyDir]).toBeDefined();
+            expect(data.codebases[tmpDir]).toBeDefined();
         });
 
         it('does not re-add recently removed codebases from disk', async () => {

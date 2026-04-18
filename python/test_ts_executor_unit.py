@@ -25,7 +25,9 @@ from ts_executor import TypeScriptExecutor, call_ts_method
 # Helpers
 # ---------------------------------------------------------------------------
 
-def make_popen_mock(stdout_lines, returncode=0, stderr=""):
+def make_popen_mock(
+    stdout_lines: list[str], returncode: int = 0, stderr: str = ""
+) -> MagicMock:
     """Return a configured mock for subprocess.Popen."""
     mock_proc = MagicMock()
     mock_proc.poll.return_value = returncode
@@ -292,10 +294,8 @@ class TestCallMethod(unittest.TestCase):
             mock_popen.return_value = mock_proc
 
             with patch("tempfile.mkstemp", side_effect=tracking_mkstemp):
-                try:
+                with self.assertRaises(RuntimeError):
                     self.executor.call_method(self.ts_file, "fn")
-                except RuntimeError:
-                    pass
 
         for p in created_files:
             self.assertFalse(os.path.exists(p), f"Temp file not cleaned up: {p}")

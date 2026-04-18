@@ -76,11 +76,15 @@ describe('SyncManager', () => {
         });
 
         it('nulls out timer IDs so they are not double-cleared', () => {
+            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+            const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+
             syncManager.startBackgroundSync();
             syncManager.dispose();
 
-            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-            const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+            // Reset counts so we only observe calls from the second dispose()
+            clearIntervalSpy.mockClear();
+            clearTimeoutSpy.mockClear();
 
             // Second dispose: IDs are null, so clear* should not be called
             syncManager.dispose();
@@ -123,7 +127,6 @@ describe('SyncManager', () => {
 
         it('replaces timer IDs after re-entry', () => {
             syncManager.startBackgroundSync();
-            const firstIntervalId = (syncManager as any).syncIntervalId;
 
             syncManager.startBackgroundSync();
             const secondIntervalId = (syncManager as any).syncIntervalId;
@@ -214,21 +217,26 @@ describe('SyncManager', () => {
         it('prevents concurrent syncs via isSyncing guard', async () => {
             // Make reindexByChange hang until we resolve manually
             let resolveFirst!: () => void;
-            const firstSyncDone = new Promise<void>((res) => {
-                resolveFirst = res;
+            const firstSyncPromise = new Promise<{
+                added: number;
+                removed: number;
+                modified: number;
+            }>((res) => {
+                resolveFirst = () => res({ added: 0, removed: 0, modified: 0 });
             });
-            context.reindexByChange = jest.fn().mockReturnValue(firstSyncDone.then(() => ({
-                added: 0,
-                removed: 0,
-                modified: 0,
-            })));
+            context.reindexByChange = jest.fn().mockReturnValue(firstSyncPromise);
             snapshotManager.getIndexedCodebases = jest.fn().mockReturnValue(['/tmp/proj']);
+
+            // Make the codebase path appear to exist so sync proceeds past the fs.existsSync guard
+            const existsSyncSpy = jest.spyOn(require('fs'), 'existsSync').mockReturnValue(true);
 
             const first = syncManager.handleSyncIndex();
             const second = syncManager.handleSyncIndex(); // should be skipped
 
             resolveFirst();
             await Promise.all([first, second]);
+
+            existsSyncSpy.mockRestore();
 
             // reindexByChange should only have been called once (second call skipped)
             expect(context.reindexByChange).toHaveBeenCalledTimes(1);
@@ -260,21 +268,29 @@ describe('SyncManager', () => {
                 .fn()
                 .mockRejectedValue(new Error('Failed to query Milvus: collection gone'));
 
+            // Make the codebase path appear to exist so sync proceeds past the fs.existsSync guard
+            const existsSyncSpy = jest.spyOn(require('fs'), 'existsSync').mockReturnValue(true);
+
             await syncManager.handleSyncIndex();
+
+            existsSyncSpy.mockRestore();
 
             expect(FileSynchronizer.deleteSnapshot).toHaveBeenCalledWith('/tmp/proj');
         });
 
         it('continues with remaining codebases when one fails', async () => {
-            snapshotManager.getIndexedCodebases = jest
-                .fn()
-                .mockReturnValue(['/tmp/a', '/tmp/b']);
+            snapshotManager.getIndexedCodebases = jest.fn().mockReturnValue(['/tmp/a', '/tmp/b']);
             context.reindexByChange = jest
                 .fn()
                 .mockRejectedValueOnce(new Error('first failed'))
                 .mockResolvedValueOnce({ added: 2, removed: 0, modified: 0 });
 
+            // Make both codebase paths appear to exist so sync proceeds past the fs.existsSync guard
+            const existsSyncSpy = jest.spyOn(require('fs'), 'existsSync').mockReturnValue(true);
+
             await syncManager.handleSyncIndex();
+
+            existsSyncSpy.mockRestore();
 
             expect(context.reindexByChange).toHaveBeenCalledTimes(2);
         });
