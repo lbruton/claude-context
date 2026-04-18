@@ -505,8 +505,9 @@ export class SnapshotManager {
         }
     }
 
-    private async acquireLock(maxRetries = 5, retryInterval = 100): Promise<boolean> {
+    private async acquireLock(maxRetries = 8, retryInterval = 100): Promise<boolean> {
         const lockPath = this.snapshotFilePath + '.lock';
+        fs.mkdirSync(path.dirname(lockPath), { recursive: true });
         for (let i = 0; i < maxRetries; i++) {
             try {
                 fs.mkdirSync(lockPath);
@@ -560,7 +561,7 @@ export class SnapshotManager {
 
         const locked = await this.acquireLock();
         if (!locked) {
-            console.warn('[SNAPSHOT-DEBUG] Failed to acquire lock, saving without lock');
+            throw new Error('Failed to acquire snapshot lock after retries');
         }
 
         try {
@@ -617,6 +618,7 @@ export class SnapshotManager {
             );
         } catch (error: any) {
             console.error('[SNAPSHOT-DEBUG] Error saving snapshot:', error);
+            throw error;
         } finally {
             if (locked) {
                 this.releaseLock();

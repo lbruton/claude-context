@@ -143,6 +143,10 @@ export class SyncManager {
     public startBackgroundSync(): void {
         console.log('[SYNC-DEBUG] startBackgroundSync() called');
 
+        // Clear any existing timers to prevent duplicate sync loops on re-entry
+        if (this.initialSyncTimeoutId) clearTimeout(this.initialSyncTimeoutId);
+        if (this.syncIntervalId) clearInterval(this.syncIntervalId);
+
         // Execute initial sync immediately after a short delay to let server initialize
         console.log('[SYNC-DEBUG] Scheduling initial sync in 5 seconds...');
         this.initialSyncTimeoutId = setTimeout(async () => {
@@ -158,7 +162,6 @@ export class SyncManager {
                     );
                 } else {
                     console.error('[SYNC-DEBUG] Initial sync failed with unexpected error:', error);
-                    throw error;
                 }
             }
         }, 5000);
