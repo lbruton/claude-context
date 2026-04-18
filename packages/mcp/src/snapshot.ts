@@ -512,7 +512,10 @@ export class SnapshotManager {
             try {
                 fs.mkdirSync(lockPath);
                 return true;
-            } catch {
+            } catch (error: any) {
+                if (error?.code !== 'EEXIST') {
+                    throw error;
+                }
                 try {
                     const stat = fs.statSync(lockPath);
                     if (Date.now() - stat.mtimeMs > 10000) {

@@ -171,7 +171,9 @@ export class SyncManager {
         this.syncIntervalId = setInterval(
             () => {
                 console.log('[SYNC-DEBUG] Executing scheduled periodic sync');
-                this.handleSyncIndex();
+                void this.handleSyncIndex().catch((error) => {
+                    console.error('[SYNC-DEBUG] Scheduled periodic sync failed:', error);
+                });
             },
             5 * 60 * 1000,
         );
