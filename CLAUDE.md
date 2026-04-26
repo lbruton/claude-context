@@ -9,7 +9,7 @@ Fork of [zilliztech/claude-context](https://github.com/zilliztech/claude-context
 Key fork changes: 30s fetch/gRPC timeouts, better error differentiation, rebranded to `@lbruton/` npm scope.
 
 **DocVault:** Start at `/Volumes/DATA/GitHub/DocVault/Projects/claude-context/_Index.md` and follow the index. mem0 supplements with session context.
-**Issue prefix:** None (tracked via OPS- issues in DevOps).
+**Issue prefix:** `CFLOW-` — tracked in Plane: <https://plane.lbruton.cc/lbruton/projects/593cfea0-1859-425a-af27-d029b30d43e1/>. Pre-migration DocVault issues archived at `DocVault/Archive/Issues-Pre-Plane/claude-context/`.
 **Branch:** `master` (not main).
 
 ## Repository Identity (Important)
@@ -18,7 +18,7 @@ This repository started as a fork of `zilliztech/claude-context`, but it is now 
 
 - `origin` is the source of truth for all PR work: `lbruton/claude-context`
 - `upstream` may still exist as a remote for occasional reference/contribution history
-- Do not treat upstream PRs/issues as actionable for this repo unless explicitly requested
+- Treat upstream PRs/issues as actionable for this repo only when explicitly requested by the user.
 - For PR operations (especially `/pr-resolve`), always scope GitHub calls to `owner: "lbruton"`, `repo: "claude-context"` via `mcp__github__*` tools (per user-level CLAUDE.md "GitHub MCP vs `gh` CLI"). Only fall back to `gh -R lbruton/claude-context` for the MCP gaps listed there (GraphQL `resolveReviewThread`, `gh pr ready`, `gh release create`, review-thread replies).
 
 ## Build & Dev Commands
@@ -66,6 +66,7 @@ The `Context` class (`context.ts`) is the main entry point. It orchestrates:
 Stdio-based MCP server exposing 4 tools: `index_codebase`, `search_code`, `clear_index`, `get_indexing_status`.
 
 Key modules:
+
 - `index.ts` — Server entry point. Redirects console.log/warn to stderr (critical for MCP JSON protocol on stdout).
 - `config.ts` — Reads env vars into `ContextMcpConfig`.
 - `handlers.ts` — Tool implementations.
@@ -80,19 +81,19 @@ Key modules:
 
 ## Important Constraints
 
-- **Console output**: In the MCP package, `console.log` and `console.warn` are redirected to stderr. Only MCP protocol JSON goes to stdout. Do not use `process.stdout.write` for logging.
+- **Console output**: In the MCP package, `console.log` and `console.warn` are redirected to stderr. Only MCP protocol JSON goes to stdout. Use `console.log` and `console.warn` for logging output; reserve stdout exclusively for MCP protocol JSON.
 - **Core is CommonJS, MCP is ESM**: Core uses `"module": "commonjs"` (tsconfig), MCP uses `"type": "module"` (package.json). Imports in MCP must use `.js` extensions.
 - **Node >=20, pnpm >=10**: Enforced in `engines` field.
 - **CI**: GitHub Actions runs lint + build on ubuntu/windows with Node 20.x/22.x. Lint step is currently commented out in CI.
 
 ## Required Environment Variables
 
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `MILVUS_ADDRESS` | Yes | gRPC endpoint (e.g., `192.168.1.81:19530`) |
-| `OPENAI_API_KEY` | Yes* | *When using OpenAI embeddings (default) |
-| `EMBEDDING_PROVIDER` | No | `OpenAI`, `VoyageAI`, `Gemini`, `Ollama` |
-| `EMBEDDING_MODEL` | No | Default: `text-embedding-3-small` |
+| Variable             | Required | Notes                                      |
+| -------------------- | -------- | ------------------------------------------ |
+| `MILVUS_ADDRESS`     | Yes      | gRPC endpoint (e.g., `192.168.1.81:19530`) |
+| `OPENAI_API_KEY`     | Yes\*    | \*When using OpenAI embeddings (default)   |
+| `EMBEDDING_PROVIDER` | No       | `OpenAI`, `VoyageAI`, `Gemini`, `Ollama`   |
+| `EMBEDDING_MODEL`    | No       | Default: `text-embedding-3-small`          |
 
 ## Hooks
 
