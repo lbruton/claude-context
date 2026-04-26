@@ -59,7 +59,7 @@ __pycache__/
 !evaluation/case_study/**/*.log
 
 .claude/*
-CLAUDE.md
+!.claude/project.json
 .worktrees/
 .spec-workflow/
 

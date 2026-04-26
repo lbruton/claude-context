@@ -1,0 +1,7 @@
+{
+    "name": "claude-context",
+    "tag": "claude-context",
+    "issuePrefix": "CFLOW",
+    "issueTag": "claude-context",
+    "cachePrefix": "claude-context"
+}

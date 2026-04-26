@@ -1,0 +1,8 @@
+{
+    "project": "claude-context",
+    "docvault": "../DocVault",
+    "issue_backend": "plane",
+    "plane_workspace": "lbruton",
+    "plane_project_id": "593cfea0-1859-425a-af27-d029b30d43e1",
+    "issue_prefix": "CFLOW"
+}
