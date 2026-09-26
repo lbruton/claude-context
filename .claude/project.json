@@ -3,5 +3,9 @@
     "tag": "claude-context",
     "issuePrefix": "CFLOW",
     "issueTag": "claude-context",
-    "cachePrefix": "claude-context"
+    "cachePrefix": "claude-context",
+    "plane": {
+        "workspace": "lbruton",
+        "projectId": "593cfea0-1859-425a-af27-d029b30d43e1"
+    }
 }
