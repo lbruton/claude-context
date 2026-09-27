@@ -7,5 +7,9 @@
     "plane": {
         "workspace": "lbruton",
         "projectId": "593cfea0-1859-425a-af27-d029b30d43e1"
+    },
+    "mem0": {
+        "userId": "lbruton",
+        "project": "claude-context"
     }
 }
