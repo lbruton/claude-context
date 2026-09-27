@@ -58,12 +58,12 @@ __pycache__/
 *.log
 !evaluation/case_study/**/*.log
 
-.claude/*
-!.claude/project.json
+# AI tools: config and instructions are tracked; only machine-local state is ignored
+.claude/settings.local.json
+.claude/**/*.local.*
+.claude/worktrees/
 .worktrees/
 .spec-workflow/
-
-.cursor/*
 
 evaluation/repos
 repos
