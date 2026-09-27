@@ -1,7 +1,10 @@
-# Dependencies
-node_modules/
+# Dependencies (no trailing slash so a symlinked node_modules in a worktree is ignored too)
+node_modules
 *.pnp
 .pnp.js
+
+# Scratch dirs from .claude/hooks/test_post_edit_lint.py (removed after each run)
+hooktest-scratch-*/
 
 # Production builds
 dist/

@@ -1,24 +1,15 @@
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Volumes/DATA/GitHub/claude-context/.claude/hooks/post-edit-lint.py"
-          }
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.py\""
+                    }
+                ]
+            }
         ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Volumes/DATA/GitHub/claude-context/.claude/hooks/post-edit-lint.py"
-          }
-        ]
-      }
-    ]
-  }
+    }
 }
