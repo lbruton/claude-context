@@ -73,3 +73,7 @@ repos
 
 evaluation/retrieval_results*
 .venv/
+# DocVault (Obsidian) per-machine state
+DocVault/.obsidian/workspace*.json
+DocVault/.obsidian/graph.json
+DocVault/.trash/

@@ -1,5 +1,6 @@
 ---
 exclude_paths:
+    - "DocVault/**"   # in-repo Obsidian vault (DEVS-78)
     - 'node_modules/**'
     - 'dist/**'
     - 'examples/**'
