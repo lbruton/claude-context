@@ -5,3 +5,6 @@ pnpm-lock.yaml
 evaluation/
 repos/
 .worktrees/
+
+# In-repo Obsidian vault (DEVS-78) — own conventions; linted by docvault-lint
+DocVault/

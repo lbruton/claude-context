@@ -9,3 +9,6 @@
 .pre-commit-config.yaml export-ignore
 .claude/          export-ignore
 CLAUDE.md         export-ignore
+
+# In-repo Obsidian vault (DEVS-78)
+DocVault/             export-ignore

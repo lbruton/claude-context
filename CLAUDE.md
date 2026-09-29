@@ -8,8 +8,8 @@ Fork of [zilliztech/claude-context](https://github.com/zilliztech/claude-context
 
 Key fork changes: 30s fetch/gRPC timeouts, better error differentiation, rebranded to `@lbruton/` npm scope.
 
-**DocVault:** Start at `/Volumes/DATA/GitHub/DocVault/Projects/claude-context/_Index.md` and follow the index. mem0 supplements with session context.
-**Issue prefix:** `CFLOW-` — tracked in Plane: <https://plane.lbruton.cc/lbruton/projects/593cfea0-1859-425a-af27-d029b30d43e1/>. Pre-migration DocVault issues archived at `DocVault/Archive/Issues-Pre-Plane/claude-context/`.
+**DocVault:** in-repo at `DocVault/` — start at `DocVault/Overview.md` (DEVS-78). Infra detail with LAN IPs lives in the private companion `Devops/DocVault/Projects/claude-context/` (`vault-path private`). mem0 supplements with session context.
+**Issue prefix:** `CFLOW-` — tracked in Plane: <https://plane.lbruton.cc/lbruton/projects/593cfea0-1859-425a-af27-d029b30d43e1/>. Pre-migration DocVault issues archived in the frozen central DocVault at `Archive/Issues-Pre-Plane/claude-context/`.
 **Branch:** `master` (not main).
 
 ## Repository Identity (Important)
