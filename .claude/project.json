@@ -11,5 +11,11 @@
     "mem0": {
         "userId": "lbruton",
         "project": "claude-context"
+    },
+    "infisical": {
+        "host": "https://infisical.lbruton.cc",
+        "projectId": "e956470c-6285-4dac-bf26-4dd1e984605f",
+        "defaultEnv": "dev",
+        "secretPath": "/mcp/claude-context"
     }
 }
