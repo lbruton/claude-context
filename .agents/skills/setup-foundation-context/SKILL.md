@@ -1,14 +1,14 @@
 ---
 name: setup-foundation-context
 description: >-
-    One-shot, idempotent onboarding of a project's agent-facing foundation docs into in-repo
-    `.context/` and scaffolds the in-repo `DocVault/` vault. Detects the source state (archived DocVault Foundation/, docs already in-repo
-    elsewhere like /docs/, or missing), migrates or scaffolds the 5 baseline foundation docs
-    plus any project extras into `.context/`, and rewires CLAUDE.md to point at the in-repo
-    copies. Dry-run by default. Run once per project in a fresh session. Operationalizes
-    DEVS-37. Triggers: "/setup-foundation-context", "setup foundation context", "migrate
-    foundation docs to .context", "onboard foundation docs", "context foundation setup".
-library-version: 7715fae9935f
+  One-shot, idempotent onboarding of a project's agent-facing foundation docs into in-repo
+  `.context/` and scaffolds the in-repo `DocVault/` vault. Detects the source state (archived DocVault Foundation/, docs already in-repo
+  elsewhere like /docs/, or missing), migrates or scaffolds the 5 baseline foundation docs
+  plus any project extras into `.context/`, and rewires CLAUDE.md to point at the in-repo
+  copies. Dry-run by default. Run once per project in a fresh session. Operationalizes
+  DEVS-37. Triggers: "/setup-foundation-context", "setup foundation context", "migrate
+  foundation docs to .context", "onboard foundation docs", "context foundation setup".
+library-version: 51a6fba8ce50
 ---
 
 # Setup Foundation Context
@@ -22,13 +22,13 @@ canonical home, ongoing upkeep is `/context-drift`'s job, not this skill's.
 
 The floor is **5 docs**; a project may have more. Migrate/scaffold these 5 into `.context/`:
 
-| `.context/` file       | What it holds                                              |
-| ---------------------- | ---------------------------------------------------------- |
-| `infrastructure.md`    | hosting, deploy, ports, services, env, external systems    |
-| `architecture.md`      | components, data flow, module boundaries, key abstractions |
-| `coding-standards.md`  | language/style conventions, lint gates, test conventions   |
-| `design-philosophy.md` | product/UX principles, the "why" behind decisions          |
-| `reusable-patterns.md` | recurring code patterns, helpers, idioms to reach for      |
+| `.context/` file | What it holds |
+|------------------|---------------|
+| `infrastructure.md` | hosting, deploy, ports, services, env, external systems |
+| `architecture.md` | components, data flow, module boundaries, key abstractions |
+| `coding-standards.md` | language/style conventions, lint gates, test conventions |
+| `design-philosophy.md` | product/UX principles, the "why" behind decisions |
+| `reusable-patterns.md` | recurring code patterns, helpers, idioms to reach for |
 
 **Project extras are preserved, not forced into the 5.** Files like `git-topology.md`,
 `implementation-gotchas.md`, `review-and-ci.md`, `integrations.md`, `spec-conventions.md`,
@@ -47,7 +47,6 @@ cat .claude/project.json 2>/dev/null   # -> name
 ```
 
 Resolve paths:
-
 - Repo root: current working directory (the project repo).
 - Project vault: `$(vault-path project)`, i.e. `<repo>/DocVault/` (exit 2 = not scaffolded yet; Phase 3 step 0 creates it)
 - Archived Foundation dir (case a source): `$(vault-path archive)/Projects/{name}/Foundation/`. After DEVS-78 these originals only exist in the frozen central repo; they stay there.
@@ -143,7 +142,6 @@ git -C {repo root} diff --stat CLAUDE.md
 ```
 
 Report:
-
 ```
 ## Foundation Context — {project} — APPLIED
 - .context/ now has: <list>  (5 baseline + <N> extras)
@@ -192,7 +190,6 @@ canonical: .context/<doc>.md
 ```
 
 Section skeletons per baseline doc:
-
 - **infrastructure.md** — Hosting / Deploy / Ports & services / Env & secrets / External systems
 - **architecture.md** — Components / Data flow / Module boundaries / Key abstractions
 - **coding-standards.md** — Language & style / Lint & format gates / Test conventions / Commit & PR rules

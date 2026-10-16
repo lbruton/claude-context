@@ -1,12 +1,12 @@
 ---
 name: wrap
 description: >
-    End-of-session orchestrator — verifies session work, saves ONE detailed session summary to
-    mem0 (the big-picture record), writes day-to-day lessons to local memory and durable facts to
-    .context/, syncs docs, and reports Session Health. Run at end of any session, optionally after
-    /pr-cleanup. Triggers: "wrap", "wrap up", "close session", "end of session",
-    "done for the night", "finish up", "closing time".
-library-version: 7715fae9935f
+  End-of-session orchestrator — verifies session work, saves ONE detailed session summary to
+  mem0 (the big-picture record), writes day-to-day lessons to local memory and durable facts to
+  .context/, syncs docs, and reports Session Health. Run at end of any session, optionally after
+  /pr-cleanup. Triggers: "wrap", "wrap up", "close session", "end of session",
+  "done for the night", "finish up", "closing time".
+library-version: 51a6fba8ce50
 ---
 
 # Wrap Session
@@ -36,12 +36,12 @@ read back by any session. Lessons now go to each harness's local memory, which i
 
 Each memory layer has one job (DEVS-75, confirmed by the user 2026-09-27):
 
-| Layer                                                                          | Holds                                                                     | Written by /wrap as                   |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------- |
-| **mem0**                                                                       | The bigger picture: what was worked on, when, where, and what was decided | ONE detailed session summary (Step 3) |
-| **Local agent memory** (Claude Code: auto-memory; Codex: `~/.codex/memories/`) | Active day-to-day operating memory: preferences, corrections, gotchas     | Local memory entries (Step 4)         |
-| **`.context/`**                                                                | Long-term foundational context for implementation work                    | Doc sync via chore PR (Step 5)        |
-| **SessionFlow + git**                                                          | Verbatim turns and exact history                                          | Nothing — indexed automatically       |
+| Layer | Holds | Written by /wrap as |
+|---|---|---|
+| **mem0** | The bigger picture: what was worked on, when, where, and what was decided | ONE detailed session summary (Step 3) |
+| **Local agent memory** (Claude Code: auto-memory; Codex: `~/.codex/memories/`) | Active day-to-day operating memory: preferences, corrections, gotchas | Local memory entries (Step 4) |
+| **`.context/`** | Long-term foundational context for implementation work | Doc sync via chore PR (Step 5) |
+| **SessionFlow + git** | Verbatim turns and exact history | Nothing — indexed automatically |
 
 mem0 + SessionFlow + git history together give the full picture. mem0 does not need to repeat
 turn-level detail — it needs searchable anchors (issue IDs, file paths, PR numbers, decisions)
@@ -53,7 +53,7 @@ that let a later session find the right SessionFlow turns and commits.
    no phase banners. Just observe → summarize → save → report.
 2. **Take action autonomously where the action is obvious.** If main is behind origin and
    the working tree is clean, pull — do not ask. If a worktree has uncommitted changes,
-   _do not_ delete it and _do not_ ask — just report it as a soft warning.
+   *do not* delete it and *do not* ask — just report it as a soft warning.
 3. **All warnings live in the Session Health block at the end.** Never interrupt the flow
    with a yellow/red issue mid-stream. Report once, at the bottom, in one place.
 
@@ -155,7 +155,7 @@ add_memory(
 
 ### Step 4 — Operating memory (local agent memory)
 
-If the session produced something the _next_ session should behave differently because of —
+If the session produced something the *next* session should behave differently because of —
 a user preference or correction, a mistake that cost time, a codebase gotcha, an approach
 that worked — record it in this harness's own local memory:
 
@@ -184,18 +184,18 @@ runs that flow itself:
    several docs plus CLAUDE.md and AGENTS.md. Updating one and leaving the others is the
    most common drift source. Verify each claimed-stale line against the code before editing.
 2. **Create a docs worktree** off the freshly-pulled base branch:
-    ```bash
-    git fetch origin dev
-    git worktree add .worktrees/wrap-context-sync -b chore/context-sync-<YYYY-MM-DD> origin/dev
-    ```
+   ```bash
+   git fetch origin dev
+   git worktree add .worktrees/wrap-context-sync -b chore/context-sync-<YYYY-MM-DD> origin/dev
+   ```
 3. **Edit the stale facts in the worktree** — scoped, factual corrections only. Run the
    repo's markdown lint on the touched files.
 4. **Commit, push, open the chore PR** to the base branch (docs chores are lightweight per
    repo policy — no Plane issue, no version lock), then **enable auto-merge**:
-    ```bash
-    gh pr create --base dev --title "chore: sync .context docs after <issues shipped>" ...
-    gh pr merge <N> --merge --delete-branch --auto
-    ```
+   ```bash
+   gh pr create --base dev --title "chore: sync .context docs after <issues shipped>" ...
+   gh pr merge <N> --merge --delete-branch --auto
+   ```
 5. **Remove the worktree** (the work is pushed; auto-merge lands it when checks pass) and
    report the PR number in Session Health as a ✅ line:
    `✅ Docs synced — chore PR #<N> open with auto-merge armed`.
@@ -224,14 +224,14 @@ If no documentation impact, skip.
 
 Using the Step 1 data, derive the four Session Health checks:
 
-| Check                 | Question                                                         | Pass criteria                                                     |
-| --------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
-| **Commits committed** | Are all this session's changes committed?                        | `git status --short` is empty                                     |
-| **Local in sync**     | Is local main ahead/behind origin?                               | `git log @{u}..HEAD` empty AND `git log HEAD..@{u}` empty         |
-| **Session PR status** | Did this session merge a PR? If yes, did we pull main?           | If session-merged PR exists, local main matches origin AFTER pull |
-| **Worktrees clean**   | Any worktrees with uncommitted changes or stale merged branches? | `git worktree list` shows only main + worktrees with clean state  |
+| Check | Question | Pass criteria |
+|---|---|---|
+| **Commits committed** | Are all this session's changes committed? | `git status --short` is empty |
+| **Local in sync** | Is local main ahead/behind origin? | `git log @{u}..HEAD` empty AND `git log HEAD..@{u}` empty |
+| **Session PR status** | Did this session merge a PR? If yes, did we pull main? | If session-merged PR exists, local main matches origin AFTER pull |
+| **Worktrees clean** | Any worktrees with uncommitted changes or stale merged branches? | `git worktree list` shows only main + worktrees with clean state |
 
-**Action allowed in this step:** If local main is _behind_ origin and the working tree is
+**Action allowed in this step:** If local main is *behind* origin and the working tree is
 clean and the current branch is main, run `git pull --ff-only` autonomously.
 
 **Action NOT allowed:** Anything that touches uncommitted user work — no auto-commit, no
@@ -239,7 +239,6 @@ auto-stash, no auto-discard, no `git checkout --`, no worktree deletion. Those b
 warnings, not actions.
 
 Compute the traffic-light color:
-
 - **🟢 Green** — all four checks pass
 - **🟡 Yellow** — one or more soft warnings (uncommitted files, stale worktrees, PR open
   with passing checks, mem0 summary write failed, etc.) but nothing broken
@@ -247,7 +246,7 @@ Compute the traffic-light color:
 
 ### Step 7 — Print the recap to the user
 
-The recap is the _last_ thing the user sees.
+The recap is the *last* thing the user sees.
 
 ```
 ## Session Wrapped 🟢 / 🟡 / 🔴
@@ -296,7 +295,6 @@ session if needed._
 ```
 
 Warning examples:
-
 - `⚠ 2 uncommitted files in src/tools/ (not staged) — review and decide next session`
 - `⚠ Local main is behind origin/main by 3 commits — auto-pull skipped because working tree was dirty`
 - `⚠ PR #47 open with passing checks — not merged this session`
@@ -317,11 +315,10 @@ _Red items need attention before the next session can proceed cleanly._
 ```
 
 Red examples:
-
 - `❌ PR #47 has failing checks — investigate before next session`
 - `❌ Shared vault push rejected — check credentials` (Devops `main`, `DocVault/` only)
 
-Even when red, the wrap still completes. Red is a _report_, not a halt.
+Even when red, the wrap still completes. Red is a *report*, not a halt.
 
 ---
 

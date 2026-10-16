@@ -1,14 +1,14 @@
 ---
 name: vault-update
 description: >
-    Update DocVault documentation after a change: the project's in-repo vault
-    (<repo>/DocVault/, rides the current branch and PR) or the shared cross-project vault
-    (Devops/DocVault/, commits directly to Devops main). Use when infrastructure changes,
-    architecture decisions are made, or project docs need updating. Triggers on: "update vault",
-    "vault update", "docvault", "update docs", "add to vault", "vault"
+  Update DocVault documentation after a change: the project's in-repo vault
+  (<repo>/DocVault/, rides the current branch and PR) or the shared cross-project vault
+  (Devops/DocVault/, commits directly to Devops main). Use when infrastructure changes,
+  architecture decisions are made, or project docs need updating. Triggers on: "update vault",
+  "vault update", "docvault", "update docs", "add to vault", "vault"
 user-invocable: true
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob
-library-version: 7715fae9935f
+library-version: 51a6fba8ce50
 ---
 
 # Vault Update
@@ -19,11 +19,11 @@ Since DEVS-78 (2026-09-28), docs are split across three vaults. There is no cent
 
 Resolve paths with `vault-path` (installed at `~/.local/bin/vault-path`, source `Devops/scripts/vault-path.sh`):
 
-| Vault                 | Path                                                                                 | Holds                                                                                                                                | How edits land                                                                                                |
-| --------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| **Project**           | `PROJECT_VAULT=$(vault-path project)`, i.e. `<repo>/DocVault/`                       | Overview, `specs/`, Research, Runbooks, curated pages for this project                                                               | Edit inside the **current worktree**. The change rides the feature branch and PR. No separate commit or push. |
-| **Shared**            | `SHARED_VAULT=$(vault-path shared)`, usually `/Volumes/DATA/GitHub/Devops/DocVault/` | KnowledgeBase (Infrastructure, Architecture, Skill/Agent Matrix), Runbooks, cross-project Research, Clippings, Reports               | Commit **directly to Devops `main`**, paths under `DocVault/` only.                                           |
-| **Private companion** | `$(vault-path private)`, i.e. `$SHARED_VAULT/Projects/<name>/`                       | Anything from a **public** repo that can't be public: LAN IPs, internal hostnames, security reviews, dated audit/sweep/drift reports | Same as shared.                                                                                               |
+| Vault | Path | Holds | How edits land |
+| --- | --- | --- | --- |
+| **Project** | `PROJECT_VAULT=$(vault-path project)`, i.e. `<repo>/DocVault/` | Overview, `specs/`, Research, Runbooks, curated pages for this project | Edit inside the **current worktree**. The change rides the feature branch and PR. No separate commit or push. |
+| **Shared** | `SHARED_VAULT=$(vault-path shared)`, usually `/Volumes/DATA/GitHub/Devops/DocVault/` | KnowledgeBase (Infrastructure, Architecture, Skill/Agent Matrix), Runbooks, cross-project Research, Clippings, Reports | Commit **directly to Devops `main`**, paths under `DocVault/` only. |
+| **Private companion** | `$(vault-path private)`, i.e. `$SHARED_VAULT/Projects/<name>/` | Anything from a **public** repo that can't be public: LAN IPs, internal hostnames, security reviews, dated audit/sweep/drift reports | Same as shared. |
 
 `vault-path project` exits 2 when the repo has no `DocVault/` yet. Scaffold it from `$SHARED_VAULT/Templates/project-vault/README.md`.
 
@@ -52,8 +52,8 @@ New notes follow this pattern:
 ```markdown
 ---
 tags: [relevant-tag]
-created: 'YYYY-MM-DD'
-updated: 'YYYY-MM-DD'
+created: "YYYY-MM-DD"
+updated: "YYYY-MM-DD"
 ---
 
 # Title
