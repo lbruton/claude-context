@@ -1,10 +1,10 @@
 ---
 name: spec-tasks
-description: "Spec Phase 4 — break approach into a TDD sprint-cohort checklist in tasks.md. Standalone, ISSUE-first. Reads universal + per-project conventions and the tasks template."
+description: 'Spec Phase 4 — break approach into a TDD sprint-cohort checklist in tasks.md. Standalone, ISSUE-first. Reads universal + per-project conventions and the tasks template.'
 user-invocable: true
 allowed-tools: >-
-  Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
-library-version: e65c1c54f067
+    Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
+library-version: 7715fae9935f
 ---
 
 # /spec-tasks ISSUE
@@ -30,11 +30,11 @@ Missing `<ISSUE-ID>` → print `Usage: /spec-tasks <ISSUE-ID>` and exit.
 1. **Resolve the spec folder**; read all three prior phase docs (`requirements`, `discovery`, `approach`).
 2. **Unreconciled-marks PRE-CHECK** (per conventions.md) on all three. Any unreconciled marks → STOP and name the file + `/spec-reconcile {ISSUE-ID} {phase}`.
 3. **Draft `tasks.md`** from the template:
-   - **Sprint Cohort 0 — Setup**: worktree-confirmation task using the **project's** convention from `.context/spec-conventions.md` (e.g. StakTrakr → `/start-patch`, `patch/<version>` branch). Generic fallback `spec/{ISSUE-ID}-{slug}` only when no project convention exists.
-   - **TDD cohorts**: A = foundation/scaffolding, B = tests (RED — failing tests encoding each EARS acceptance criterion), C = implementation (GREEN). If a task has no testable behavior, B gets a read-only justification task, not a silent skip.
-   - Mark parallel-safe tasks `[P]`; give every task explicit `File(s):`, an `Acceptance:` line, `Maps to: AC-N`, and `Leverage:` hints.
-   - **Standard Closing Tasks**: copy from the template, bind skill names to the project roster **verbatim** (`/release patch`, `codacy-analysis-cli`, `/vault-update`, `/pr-resolve`, `/spec archive`). Irrelevant ones → `N/A — <reason>`, never dropped.
-   - Set frontmatter `approved:` **empty** — the human stamps it.
+    - **Sprint Cohort 0 — Setup**: worktree-confirmation task using the **project's** convention from `.context/spec-conventions.md` (e.g. StakTrakr → `/start-patch`, `patch/<version>` branch). Generic fallback `spec/{ISSUE-ID}-{slug}` only when no project convention exists.
+    - **TDD cohorts**: A = foundation/scaffolding, B = tests (RED — failing tests encoding each EARS acceptance criterion), C = implementation (GREEN). If a task has no testable behavior, B gets a read-only justification task, not a silent skip.
+    - Mark parallel-safe tasks `[P]`; give every task explicit `File(s):`, an `Acceptance:` line, `Maps to: AC-N`, and `Leverage:` hints.
+    - **Standard Closing Tasks**: copy from the template, bind skill names to the project roster **verbatim** (`/release patch`, `codacy-analysis-cli`, `/vault-update`, `/pr-resolve`, `/spec archive`). Irrelevant ones → `N/A — <reason>`, never dropped.
+    - Set frontmatter `approved:` **empty** — the human stamps it.
 
 ### Mandatory cross-checks before saving
 

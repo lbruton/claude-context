@@ -1,13 +1,13 @@
 ---
 name: spec-discovery
-description: "Spec Phase 2 — research the codebase + prior art into discovery.md. Standalone, ISSUE-first. Uses a read-only Workflow fan-out for the research sweep."
+description: 'Spec Phase 2 — research the codebase + prior art into discovery.md. Standalone, ISSUE-first. Uses a read-only Workflow fan-out for the research sweep.'
 user-invocable: true
 allowed-tools: >-
-  Bash, Read, Write, Edit, Glob, Grep, Workflow, ToolSearch,
-  mcp__claude-context__search_code,
-  mcp__context7__resolve-library-id,
-  mcp__brave-search__brave_web_search
-library-version: e65c1c54f067
+    Bash, Read, Write, Edit, Glob, Grep, Workflow, ToolSearch,
+    mcp__claude-context__search_code,
+    mcp__context7__resolve-library-id,
+    mcp__brave-search__brave_web_search
+library-version: 7715fae9935f
 ---
 
 # /spec-discovery ISSUE
@@ -32,17 +32,18 @@ Read **`.claude/skills/spec/references/conventions.md`** and the project's **`.c
 2. **Unreconciled-marks PRE-CHECK** (per conventions.md): scan `requirements.md` for reviewer marks outside `## Review Archive`. If any exist, STOP: "requirements has not been reconciled — run `/spec-reconcile {ISSUE-ID} requirements` first." Do not research on top of un-reconciled review.
 3. **Research sweep — four read-only angles.**
    Dispatch them as a read-only Workflow fan-out. This is pure read work across independent angles, so it's the canonical Workflow use. Run the four angles as parallel agents, each returning structured findings:
-   - **Structural** — Grep/Glob for affected modules, callers, dependencies. Grep each candidate identifier repo-wide and read the hits; that is the exhaustive path to a call list.
-   - **Semantic** — claude-context `search_code` for the feature domain, reusable patterns, integration points.
-   - **Prior decisions** — mem0 (and sessionflow if useful) for past choices on this area. Record exact query strings.
-   - **External** — context7 / Brave for libraries, RFCs, platform docs — only if the work involves them.
+    - **Structural** — Grep/Glob for affected modules, callers, dependencies. Grep each candidate identifier repo-wide and read the hits; that is the exhaustive path to a call list.
+    - **Semantic** — claude-context `search_code` for the feature domain, reusable patterns, integration points.
+    - **Prior decisions** — mem0 (and sessionflow if useful) for past choices on this area. Record exact query strings.
+    - **External** — context7 / Brave for libraries, RFCs, platform docs — only if the work involves them.
 
-   Synthesize the returned findings yourself; do not let an agent write `discovery.md`. For a narrow spec where one or two angles obviously suffice, skip the Workflow and run those searches inline — match the fan-out to the surface area.
+    Synthesize the returned findings yourself; do not let an agent write `discovery.md`. For a narrow spec where one or two angles obviously suffice, skip the Workflow and run those searches inline — match the fan-out to the surface area.
+
 4. **Draft `discovery.md`** per the template:
-   - Existing code/files relevant to the work (with `path:line`).
-   - Prior decisions (mem0/sessionflow) — cite the query strings used.
-   - External references (libraries, RFCs, docs) with links.
-   - **Open questions** that block `approach.md`.
+    - Existing code/files relevant to the work (with `path:line`).
+    - Prior decisions (mem0/sessionflow) — cite the query strings used.
+    - External references (libraries, RFCs, docs) with links.
+    - **Open questions** that block `approach.md`.
 5. **Save `discovery.md`.** Touch no other file.
 
 ## Output
