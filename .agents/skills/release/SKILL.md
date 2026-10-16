@@ -1,7 +1,7 @@
 ---
 name: release
 description: Release workflow — version lock, worktree, bump, commit, PR, GitHub Release. Delegates to project overrides.
-library-version: e65c1c54f067
+library-version: 7715fae9935f
 ---
 
 # Release — Universal Version Lock Workflow
