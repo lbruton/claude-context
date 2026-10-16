@@ -1,10 +1,10 @@
 ---
 name: issue
 description: >
-  Issue management — create, read, update, list. All projects use Plane via
-  `mcp__plane__*` tools. Config lives in `.claude/project.json` (`plane` block).
-  Triggers on: "create issue", "issue", "new issue", "new bug", "file a bug",
-  "track this".
+    Issue management — create, read, update, list. All projects use Plane via
+    `mcp__plane__*` tools. Config lives in `.claude/project.json` (`plane` block).
+    Triggers on: "create issue", "issue", "new issue", "new bug", "file a bug",
+    "track this".
 user-invocable: false
 library-version: 7715fae9935f
 ---
@@ -18,6 +18,7 @@ All issue operations route through Plane MCP. Read the project config first.
 Use the `Read` tool on `.claude/project.json` (relative to the repo root).
 
 Extract:
+
 - `name` — display name
 - `issuePrefix` — e.g. `HOME`, `DEVS`, `STRK`
 - `plane.workspace` — e.g. `"lbruton"`
@@ -33,59 +34,59 @@ If there is no `plane` block, stop and tell the user the project isn't wired to 
 
 1. **Resolve state and label IDs once per session:**
 
-   ```
-   mcp__plane__state   action: "list", project_id: {plane_project_id}
-   mcp__plane__label   action: "list", project_id: {plane_project_id}
-   ```
+    ```
+    mcp__plane__state   action: "list", project_id: {plane_project_id}
+    mcp__plane__label   action: "list", project_id: {plane_project_id}
+    ```
 
-   Map names → uuids. Cache for the rest of the session.
+    Map names → uuids. Cache for the rest of the session.
 
 2. **Pick state and label from user intent:**
 
-   | Intent | State | Label |
-   |---|---|---|
-   | New backlog item | `Backlog` | based on type |
-   | Ready to work | `Todo` | based on type |
-   | Active work | `In Progress` | based on type |
+    | Intent           | State         | Label         |
+    | ---------------- | ------------- | ------------- |
+    | New backlog item | `Backlog`     | based on type |
+    | Ready to work    | `Todo`        | based on type |
+    | Active work      | `In Progress` | based on type |
 
-   Type → label map (matches conventional commits):
+    Type → label map (matches conventional commits):
 
-   | Type | Label |
-   |---|---|
-   | `feature`, `feat` | `Feature` |
-   | `bug`, `fix` | `Bug` |
-   | `chore` | `Chore` |
-   | `docs`, `documentation` | `Documentation` |
-   | `patch`, `hotfix` | `Patch` |
+    | Type                    | Label           |
+    | ----------------------- | --------------- |
+    | `feature`, `feat`       | `Feature`       |
+    | `bug`, `fix`            | `Bug`           |
+    | `chore`                 | `Chore`         |
+    | `docs`, `documentation` | `Documentation` |
+    | `patch`, `hotfix`       | `Patch`         |
 
 3. **Create the issue:**
 
-   ```
-   mcp__plane__workitem
-     action: "create"
-     project_id: {plane_project_id}
-     name: "{title}"
-     description_html: "{html-rendered description}"
-     state: {state_uuid}
-     labels: [{label_uuid}]
-     priority: "urgent"|"high"|"medium"|"low"|"none"
-   ```
+    ```
+    mcp__plane__workitem
+      action: "create"
+      project_id: {plane_project_id}
+      name: "{title}"
+      description_html: "{html-rendered description}"
+      state: {state_uuid}
+      labels: [{label_uuid}]
+      priority: "urgent"|"high"|"medium"|"low"|"none"
+    ```
 
-   Fields are flat — there is no `issue_data` wrapper on the current server (DEVS-77).
+    Fields are flat — there is no `issue_data` wrapper on the current server (DEVS-77).
 
-   Plane assigns `sequence_id` automatically — capture from the response. The full issue ID is `{issue_prefix}-{sequence_id}` (e.g. `SFLW-8`).
+    Plane assigns `sequence_id` automatically — capture from the response. The full issue ID is `{issue_prefix}-{sequence_id}` (e.g. `SFLW-8`).
 
 4. **Assign:** follow "Assign after create" below. Do not pass `assignees` in step 3.
 
 5. **Confirm:**
 
-   ```
-   Created {issue_prefix}-{sequence_id}: {title}
-     URL: https://plane.lbruton.cc/lbruton/browse/{issue_prefix}-{sequence_id}/
-     State: {state}
-     Labels: {labels}
-     Priority: {priority}
-   ```
+    ```
+    Created {issue_prefix}-{sequence_id}: {title}
+      URL: https://plane.lbruton.cc/lbruton/browse/{issue_prefix}-{sequence_id}/
+      State: {state}
+      Labels: {labels}
+      Priority: {priority}
+    ```
 
 ### Read
 
@@ -132,7 +133,7 @@ Never set `assignees` on `create`. Assign in a follow-up `manage_assignee` call:
 
 - **The agent will work the issue itself:** add itself per Pick up above. Its notification emails reach the human through the agent's mailbox.
 - **The issue needs action from the human** (a decision, a manual step, a review, credentials): assign the human so the email goes to them directly. Resolve their id with `mcp__plane__member` `action: "list_project"` (match the email `lbruton@pm.me`; never hardcode the id), then `manage_assignee` with `add_user_id`.
-  - If the `create` response already lists the human in `assignees` (the project has them as default assignee), that assignment did not subscribe them. Call `manage_assignee` with `remove_user_id` first, then a **second** call with `add_user_id`. One call carrying both nets to no change.
+    - If the `create` response already lists the human in `assignees` (the project has them as default assignee), that assignment did not subscribe them. Call `manage_assignee` with `remove_user_id` first, then a **second** call with `add_user_id`. One call carrying both nets to no change.
 - **Neither:** leave it as created. The human does not need to be on every issue.
 
 Comments posted through the API notify **nobody** (the public API skips the notification step for comments and comment mentions). When the human must see something, make a state or property change alongside the comment, or assign them as above.
@@ -162,22 +163,22 @@ Filter client-side on `state.group` (`backlog` / `unstarted` / `started` / `comp
 
 Authoritative source: each project's `.claude/project.json` (`issuePrefix` + `plane.projectId`). The table below is a convenience reference.
 
-| Prefix | Project |
-|---|---|
-| `HOME` | HomeNetwork |
-| `DEVS` | Devops |
-| `SFLW` | SpecFlow |
-| `RES` | autoresearch-mlx |
-| `STRK` | StakTrakr |
-| `HXTR` | HexTrackr |
-| `FRGE` | Forge |
-| `WOF` | WhoseOnFirst |
-| `MELO` | MyMelo |
-| `CFLOW` | claude-context |
-| `PAPI` | PAPiTA |
-| `SESF` | SessionFlow |
-| `DOCV` | DocVault |
-| `WWW` | Portfolio |
+| Prefix  | Project          |
+| ------- | ---------------- |
+| `HOME`  | HomeNetwork      |
+| `DEVS`  | Devops           |
+| `SFLW`  | SpecFlow         |
+| `RES`   | autoresearch-mlx |
+| `STRK`  | StakTrakr        |
+| `HXTR`  | HexTrackr        |
+| `FRGE`  | Forge            |
+| `WOF`   | WhoseOnFirst     |
+| `MELO`  | MyMelo           |
+| `CFLOW` | claude-context   |
+| `PAPI`  | PAPiTA           |
+| `SESF`  | SessionFlow      |
+| `DOCV`  | DocVault         |
+| `WWW`   | Portfolio        |
 
 ---
 

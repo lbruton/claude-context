@@ -3,8 +3,8 @@ name: codacy-cloud-cli
 description: Uses the Codacy Cloud CLI to query repositories, issues, security findings, pull requests, tools, and patterns on Codacy Cloud. Use whenever the user mentions Codacy, asks about code quality metrics, wants to check issues or findings in a repo, inspect a pull request analysis, browse security vulnerabilities, enable or disable tools, search patterns, trigger a reanalysis, or interact with any remote Codacy data — even if they don't say "Codacy CLI" explicitly.
 license: MIT
 metadata:
-  author: Codacy
-  version: 1.6.1
+    author: Codacy
+    version: 1.6.1
 library-version: 7715fae9935f
 ---
 
@@ -89,6 +89,7 @@ codacy repository gh my-org my-repo --reanalyze
 ```
 
 When using `--reanalyze` without `--and-wait`, check progress manually by re-running the command without `--reanalyze`:
+
 - **Table output:** look at the "Analysis" field — `"Reanalysis in progress..."` means it is still running; `"Finished X ago"` means it is done
 - **JSON output:** compare the `startedAnalysis` and `endedAnalysis` timestamps — complete when `startedAnalysis` > trigger time AND `endedAnalysis` > `startedAnalysis`
 
@@ -132,6 +133,7 @@ codacy issues gh my-org my-repo -O -o json                     # JSON — includ
 ```
 
 The `--overview` output includes:
+
 - **False positive counts** per pattern — labeled as "Not a False Positive" / "Potential False Positive"
 - **Suggested actions to reduce noise** — identifies patterns accounting for 10%+ of all issues or 3x the average per-pattern count, and generates ready-to-run `codacy pattern` disable commands for each. If a pattern is enforced by a coding standard or uses a config file, the suggestion adapts accordingly (e.g., suggests editing the coding standard or the config file instead)
 
@@ -234,10 +236,12 @@ codacy patterns gh my-org my-repo pylint --categories CodeStyle --severities Min
 ```
 
 **Configuration file and coding standard awareness:**
+
 - When a tool uses a local configuration file (`--configuration-file true`), `codacy patterns` skips fetching managed patterns (they don't apply)
 - When a pattern is enforced by a coding standard, `--enable`/`--disable` will refuse the operation with a message indicating which standard enforces it. Update the coding standard at the organization level instead, or unlink the standard from the repository first (`codacy repository ... --unlink-standard <id>`)
 
 Pattern search tip: Codacy pattern IDs combine tool prefix and original ID. Use `--search` with the original ID to find them:
+
 ```bash
 codacy patterns gh my-org my-repo semgrep --search HttpGetHTTPRequest
 codacy patterns gh my-org my-repo pylint --search W0123
@@ -256,6 +260,7 @@ codacy tools gh my-org my-repo --import --force -y               # unlink coding
 The `--import` flag reads a local `.codacy/codacy.config.json` (or a specified path) and applies the tool and pattern configuration to the Codacy Cloud repository. Use `-y` (`--skip-approval`) to skip the interactive confirmation. Use `--force` to unlink the repository from its Coding Standard before importing — this is required when org-level standards block pattern changes.
 
 **Import behavior:**
+
 - Preserves cloud-only tools during import — only tools supported locally are modified; cloud-only tools (e.g., SonarSharp, Codacy ScalaMeta Pro) keep their existing enabled/disabled state
 - Handles config-file mode correctly — when a tool uses a local configuration file, the import skips resetting its managed patterns (they don't apply)
 - Surfaces structured API error details on import failures, including which tools/patterns conflicted and why
@@ -265,39 +270,47 @@ The `--import` flag reads a local `.codacy/codacy.config.json` (or a specified p
 ## Common workflows
 
 **Check critical security issues in a repo:**
+
 ```bash
 codacy findings gh my-org my-repo --severities Critical,High
 ```
 
 **Review what a PR introduced:**
+
 ```bash
 codacy pull-request gh my-org my-repo 42
 codacy pull-request gh my-org my-repo 42 --diff
 ```
 
 **Understand a specific issue:**
+
 ```bash
 codacy issue gh my-org my-repo <issueId>   # includes pattern docs and code context
 ```
 
 **Trigger reanalysis and wait for results:**
+
 ```bash
 codacy repository gh my-org my-repo --reanalyze-and-wait
 codacy repository gh my-org my-repo -w -o json    # JSON delta report with issue changes by pattern/severity/category
 ```
 
 **Identify and reduce noise:**
+
 ```bash
 codacy issues gh my-org my-repo --overview        # see false positive counts and suggested actions to reduce noise
 ```
 
 **Check whether a vulnerable dependency is actually reachable:**
+
 ```bash
 codacy issue gh my-org my-repo <issueId>          # or: codacy finding gh my-org my-repo <findingId>
 ```
+
 If the output includes a `Vulnerable Functions` block, search the repo for calls to those functions (including re-exports and wrapper functions). If none are found, ignore the issue/finding with `--ignore-reason NotExploitable`; otherwise recommend upgrading the dependency.
 
 **Audit vulnerable dependencies across one or multiple repos at once:**
+
 ```bash
 # one repo
 codacy findings gh my-org my-repo --scan-types SCA --output json
@@ -307,4 +320,5 @@ for repo in my-repo-one my-repo-two; do
   codacy findings gh my-org "$repo" --scan-types SCA --output json
 done | jq -s '{findings: (map(.findings) | add)}'
 ```
+
 Keep only findings where `advisoryInformation.vulnerableFunctions` is a non-empty array — it's sometimes present but empty, which means no reachability check is possible. For each, `dependencyChains` tells you Direct (a single package) vs. Transitive (2+ packages — the first package in the chain is the one to upgrade); when `dependencyChains` is missing entirely, Codacy hasn't resolved the import path, so treat it as unknown rather than assuming Direct — plenty of transitive packages (verified against real `package.json`/lockfile data) show up with no chain at all. For each repository above, search your local checkout for calls to the listed functions, then report back per repository — used/not used, chain status, recommendation — and wait for confirmation before ignoring anything with `--ignore-reason NotExploitable` or applying an upgrade.

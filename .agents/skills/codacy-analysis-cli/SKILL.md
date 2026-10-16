@@ -3,8 +3,8 @@ name: codacy-analysis-cli
 description: Uses the Codacy Analysis CLI to run local static analysis on repositories or specific files. Handles installation, initialization, dependency management, dry-runs, and analysis with JSON output. Use whenever the user wants to analyze code locally, run static analysis, scan for bugs or security issues, lint files, check code quality without pushing to Codacy, or run tools like ESLint, Ruff, Semgrep, RuboCop, or any other supported analyzer on their machine. Also trigger when the user asks to analyze staged changes, scan a PR locally, or set up local Codacy analysis.
 license: MIT
 metadata:
-  author: Codacy
-  version: 1.5.0
+    author: Codacy
+    version: 1.5.0
 library-version: 7715fae9935f
 ---
 
@@ -61,10 +61,10 @@ codacy-analysis <command> --help
 
 The CLI uses two managed locations:
 
-| Location | Scope | Contents |
-|----------|-------|----------|
-| `.codacy/` (in repo root) | Per-project | `codacy.config.json`, `generated/` (tool configs), `.gitignore` (auto-created) |
-| `~/.codacy/` (home dir) | Machine-wide | Runtimes, tool binaries, caches, logs, credentials |
+| Location                  | Scope        | Contents                                                                       |
+| ------------------------- | ------------ | ------------------------------------------------------------------------------ |
+| `.codacy/` (in repo root) | Per-project  | `codacy.config.json`, `generated/` (tool configs), `.gitignore` (auto-created) |
+| `~/.codacy/` (home dir)   | Machine-wide | Runtimes, tool binaries, caches, logs, credentials                             |
 
 The analyzed repository is **never modified outside of `.codacy/`**. The `.codacy/.gitignore` is auto-created to exclude `generated/`, logs, and other transient files.
 
@@ -95,6 +95,7 @@ Analysis Progress:
 Choose the init mode based on the repository's situation:
 
 **Repository is in Codacy and you want its exact config:**
+
 ```bash
 # Requires authentication (login or CODACY_API_TOKEN)
 codacy-analysis init --remote <provider> <org> <repo>
@@ -102,12 +103,14 @@ codacy-analysis init --remote <provider> <org> <repo>
 ```
 
 **Repository is in Codacy but you just want sensible defaults:**
+
 ```bash
 # No token needed — uses the public Codacy API for default patterns
 codacy-analysis init --default
 ```
 
 **Broad auto-tuned initialization (maximum pattern coverage):**
+
 ```bash
 # Initializes with all patterns matching the given severity/category filter
 codacy-analysis init --auto "AllCritical,High,Warning,Minor,AllSecurity,ErrorProne,Performance,BestPractice,UnusedCode,Compatibility,Complexity,Comprehensibility,CodeStyle,Documentation"
@@ -116,12 +119,14 @@ codacy-analysis init --auto "AllCritical,High,Warning,Minor,AllSecurity,ErrorPro
 The `--auto` flag selects patterns broadly based on a comma-separated filter of severities and categories. Use this when you want to start with maximum coverage and then trim noise using analysis data.
 
 **Repository is not in Codacy (local-only analysis):**
+
 ```bash
 # Detects languages and tools based on local files and config
 codacy-analysis init
 ```
 
 **A specific directory (not the current one):**
+
 ```bash
 codacy-analysis init /path/to/repo
 ```
@@ -219,6 +224,7 @@ codacy-analysis analyze --inspect --output-format json | jq '.capability.unavail
 **Important:** `--inspect`, `--install-dependencies`, and `--fail-if-missing` are **all mutually exclusive** — combining any two exits `2`. Use them in sequence: `--inspect` to check readiness, `--install-dependencies` to install and run, `--fail-if-missing` on later runs.
 
 **Decision point:**
+
 - If all needed tools are in `capability.ready` → skip to Step 4
 - If tools are in `capability.unavailable` → proceed to Step 3
 
@@ -375,6 +381,7 @@ codacy-analysis analyze --fail-if-missing --output-format json \
 Empty `executed` means nothing was scanned — **unverified, not clean**. Always name the tools behind a clean result.
 
 **Exit codes:**
+
 - `0` — No issues found — trustworthy only if `toolResults` is non-empty
 - `1` — Issues found
 - `2` — Execution error: unavailable tools in strict mode, conflicting flags, bad `--diff` base, or tool crash (check `errors[].kind`). Never means clean.
@@ -455,20 +462,20 @@ codacy-analysis analyze --tool RuboCop --tool Reek --tool Brakeman --output-form
 
 ## Troubleshooting
 
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| `Tool X not found` / tool in `unavailable` | Tool binary not installed | Run with `--install-dependencies`; if that fails, install the tool manually |
-| Analysis produces no results | No tools enabled or no matching files | Re-run `codacy-analysis init` or check `.codacy/codacy.config.json` has tools configured |
-| Wrong tools detected | Language detection missed files | Use `--tool <id>` to force specific tools |
-| Tool timeout | Analysis takes too long on large codebase | Increase `--tool-timeout <ms>` (default 600000) |
-| Config outdated after adding new languages | Init was run before new files existed | Run `codacy-analysis update-config` |
-| `Config already exists` on init | `.codacy/codacy.config.json` already present | Use `update-config` instead, or delete `.codacy/codacy.config.json` first |
-| Remote init fails with auth error | Missing or invalid API token | Run `codacy-analysis login` or set `CODACY_API_TOKEN` |
-| Permission errors on `~/.codacy/` | Directory ownership mismatch | Check permissions: `ls -la ~/.codacy/` |
-| Inspect shows tool as `bundled` but it fails | Bundled library tool has dependency issue | Check `--log-level debug` output; may need `npm rebuild` |
-| Different results than Codacy Cloud | Different tool versions or pattern config | Use `init --remote` to sync config; check tool versions in inspect output |
-| Exit `2`, `errors[].kind == "UnavailableTools"` | Strict mode and a tool can't run | Run `--install-dependencies`, or scope with `--tool <id>` |
-| Clean result but nothing scanned | No tools enabled for the changed files | Check `toolResults` is non-empty; re-run `init` |
+| Problem                                         | Cause                                        | Fix                                                                                      |
+| ----------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `Tool X not found` / tool in `unavailable`      | Tool binary not installed                    | Run with `--install-dependencies`; if that fails, install the tool manually              |
+| Analysis produces no results                    | No tools enabled or no matching files        | Re-run `codacy-analysis init` or check `.codacy/codacy.config.json` has tools configured |
+| Wrong tools detected                            | Language detection missed files              | Use `--tool <id>` to force specific tools                                                |
+| Tool timeout                                    | Analysis takes too long on large codebase    | Increase `--tool-timeout <ms>` (default 600000)                                          |
+| Config outdated after adding new languages      | Init was run before new files existed        | Run `codacy-analysis update-config`                                                      |
+| `Config already exists` on init                 | `.codacy/codacy.config.json` already present | Use `update-config` instead, or delete `.codacy/codacy.config.json` first                |
+| Remote init fails with auth error               | Missing or invalid API token                 | Run `codacy-analysis login` or set `CODACY_API_TOKEN`                                    |
+| Permission errors on `~/.codacy/`               | Directory ownership mismatch                 | Check permissions: `ls -la ~/.codacy/`                                                   |
+| Inspect shows tool as `bundled` but it fails    | Bundled library tool has dependency issue    | Check `--log-level debug` output; may need `npm rebuild`                                 |
+| Different results than Codacy Cloud             | Different tool versions or pattern config    | Use `init --remote` to sync config; check tool versions in inspect output                |
+| Exit `2`, `errors[].kind == "UnavailableTools"` | Strict mode and a tool can't run             | Run `--install-dependencies`, or scope with `--tool <id>`                                |
+| Clean result but nothing scanned                | No tools enabled for the changed files       | Check `toolResults` is non-empty; re-run `init`                                          |
 
 ### Reading logs
 
