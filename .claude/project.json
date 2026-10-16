@@ -17,5 +17,17 @@
         "projectId": "e956470c-6285-4dac-bf26-4dd1e984605f",
         "defaultEnv": "dev",
         "secretPath": "/mcp/claude-context"
+    },
+    "kind": "code",
+    "harnesses": {
+        "claude": true,
+        "codex": true
+    },
+    "skills": {
+        "profiles": [
+            "code-core"
+        ],
+        "extra": [],
+        "exclude": []
     }
 }
