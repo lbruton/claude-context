@@ -1,7 +1,7 @@
 ---
 name: verification-before-completion
 description: Run verification commands before claiming work is complete. Evidence before assertions.
-library-version: 51a6fba8ce50
+library-version: e4ef48071b45
 ---
 
 # Verification Before Completion
