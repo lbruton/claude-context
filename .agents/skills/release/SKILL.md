@@ -18,6 +18,7 @@ PR creation, and GitHub Release. **Delegates the actual file edits (Phase 1) to 
 ## Arguments
 
 $ARGUMENTS can be:
+
 - `release` — bump RELEASE number (e.g., 3.23.01 → 3.24.00, or 0.2.3 → 0.3.0)
 - `patch` — bump PATCH number (e.g., 3.23.01 → 3.23.02, or 0.2.3 → 0.2.4)
 - `dry-run` — preview all changes without writing
@@ -30,11 +31,13 @@ $ARGUMENTS can be:
 Use the `Read` tool on `.claude/project.json`.
 
 Extract `name`, `tag`, `issuePrefix`. These are used throughout:
+
 - `issuePrefix` → issue references in commits and PRs (e.g., STAK-55, FORGE-82)
 - `plane.projectId` → Plane issue lookups (`mcp__plane__*`)
 - `tag` → used in commit messages and lock file entries
 
 Determine the **PR target branch**:
+
 - If the repo has a `dev` branch: patches PR to `dev`, releases ship `dev → main`
 - If no `dev` branch: patches PR to `main` directly
 
@@ -86,23 +89,23 @@ Parse the `claims` array. Remove entries where `expires_at` or `claimedAt` is ol
 - If no active claims exist, read the current version from `devops/version.lock` top-level
   `version` field, or fall back to `package.json` `version`, or `js/constants.js` `APP_VERSION`
 - Increment based on argument:
-  - `patch` → increment last component (0.2.3 → 0.2.4)
-  - `release` → increment middle component, reset last to 0 (0.2.3 → 0.3.0)
+    - `patch` → increment last component (0.2.3 → 0.2.4)
+    - `release` → increment middle component, reset last to 0 (0.2.3 → 0.3.0)
 
 **3. Append your claim and write the file:**
 
 ```json
 {
-  "version": "NEW_VERSION",
-  "claims": [
-    {
-      "version": "NEW_VERSION",
-      "claimed_by": "claude / <issuePrefix>-XXX brief description",
-      "issue": "<issuePrefix>-XXX",
-      "claimed_at": "ISO-8601 timestamp",
-      "expires_at": "<claimed_at + 30 minutes>"
-    }
-  ]
+    "version": "NEW_VERSION",
+    "claims": [
+        {
+            "version": "NEW_VERSION",
+            "claimed_by": "claude / <issuePrefix>-XXX brief description",
+            "issue": "<issuePrefix>-XXX",
+            "claimed_at": "ISO-8601 timestamp",
+            "expires_at": "<claimed_at + 30 minutes>"
+        }
+    ]
 }
 ```
 
@@ -208,8 +211,8 @@ Already updated in Phase 0.2 — the top-level `version` field was set.
 
 ```json
 {
-  "version": "NEW_VERSION",
-  "releaseDate": "YYYY-MM-DD"
+    "version": "NEW_VERSION",
+    "releaseDate": "YYYY-MM-DD"
 }
 ```
 
@@ -221,9 +224,9 @@ Already updated in Phase 0.2 — the top-level `version` field was set.
 
 1. Run project-level verification if defined in the override skill
 2. Otherwise, confirm version string appears in all modified files:
-   ```bash
-   grep -r "NEW_VERSION" --include="*.json" --include="*.js" --include="*.md" . | head -20
-   ```
+    ```bash
+    grep -r "NEW_VERSION" --include="*.json" --include="*.js" --include="*.md" . | head -20
+    ```
 3. `git diff --stat` — confirm expected files changed
 4. Run `npm run build` or equivalent if the project has a build step
 5. Run tests if available: `npm test` or project-specific test command
@@ -240,10 +243,12 @@ git commit -m "vNEW_VERSION — TITLE"
 ```
 
 Commit message format: `vNEW_VERSION — TITLE`
+
 - Use em dash (`—`), not hyphen
 - Include issue references: `v0.3.0 — FORGE-82: Portfolio link integration`
 
 **Post-commit hooks** (project-specific — run if defined in project override):
+
 - Wiki update (`/wiki-update`)
 - DocVault update (`/vault-update`)
 - Any project-specific post-commit steps
@@ -424,6 +429,7 @@ Issues:   <issuePrefix>-XX → Done (Plane)
 ## Dry Run Mode
 
 If the argument is `dry-run`:
+
 - Complete Phase 0 (gather context, present plan)
 - Show exactly what would change in each file
 - Do NOT write any files, commit, push, or create PR

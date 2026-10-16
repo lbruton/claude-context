@@ -81,15 +81,15 @@ If the discovery report identified related issues, note which ones may be unbloc
 
 For each finding (review threads + Codacy + pre-analysis), classify:
 
-| Label | Meaning | Action |
-|-------|---------|--------|
-| **Resolved** | Already fixed in a subsequent commit | Reply with SHA, resolve |
-| **Fix now** | Valid concern, fix immediately | Code fix, commit, reply, resolve |
-| **Deferred** | Valid but out of scope | Reply noting deferral + issue, resolve |
-| **False positive** | Not applicable or incorrect | Reply with rationale, resolve |
-| **Acknowledged** | Valid, addressed differently | Reply explaining alternative, resolve |
-| **Won't fix** | Disagree with suggestion | Reply with justification, resolve |
-| **Pre-existing** | Codacy flagged untouched code | Note in summary, skip |
+| Label              | Meaning                                                                           | Action                                                                                         |
+| ------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Resolved**       | Already fixed in a subsequent commit                                              | Reply with SHA, resolve                                                                        |
+| **Fix now**        | Valid concern, fix immediately                                                    | Code fix, commit, reply, resolve                                                               |
+| **Deferred**       | Valid but out of scope                                                            | Reply noting deferral + issue, resolve                                                         |
+| **False positive** | Not applicable or incorrect                                                       | Reply with rationale, resolve                                                                  |
+| **Acknowledged**   | Valid, addressed differently                                                      | Reply explaining alternative, resolve                                                          |
+| **Won't fix**      | Disagree with suggestion                                                          | Reply with justification, resolve                                                              |
+| **Pre-existing**   | Codacy flagged untouched code                                                     | Note in summary, skip                                                                          |
 | **Skill required** | Fix requires a project skill invocation (e.g., `/update-spot-bundle`, `/release`) | Dispatch to subagent with skill name — subagent invokes via Skill tool, stages output, replies |
 
 ### Codacy-specific rules
@@ -103,14 +103,14 @@ For each finding (review threads + Codacy + pre-analysis), classify:
 
 **Always document the reason, not just the pattern.** If the reasoning no longer applies, treat it as a real finding.
 
-| Tool | Rule / Pattern | Classification | Reply |
-|------|---------------|----------------|-------|
-| Codacy | `localStorage.getItem/setItem` → "use loadData()/saveData()" | False positive (scalar string preferences) | "False positive — loadData() is async and JSON-serializes values — incorrect for a plain scalar string preference." |
-| CodeQL | `js/clear-text-storage-of-sensitive-data` on `apiKey`/`access_token` in localStorage | False positive (user-owned credentials, single-user local app, no server secrets) | "False positive — StakTrakr stores user-entered credentials on the user's own device. No server secrets. Accepted risk per project security model." |
-| CodeQL / GH Security | Format string injection on `console.error(\`...\`, err)` | False positive (JS console doesn't do printf substitution) | "False positive — Node.js console.error does not perform %s/%d format substitution. Template literal produces a plain string argument, no injection surface." |
-| Codacy | Duplication delta on `js/diff-modal.js` type-dispatch renderers | Deferred | "Deferred to STAK-458 — structural byproduct of type-dispatch renderer pattern. Tracked for refactor." |
-| Copilot | `document.getElementById` in `about.js` / `init.js` | False positive | "False positive — startup code in about.js/init.js operates on elements guaranteed to exist at DOM-ready. safeGetElement() exception documented in copilot-instructions.md." |
-| Copilot | "undefined variable" for any global | False positive | "False positive — vanilla JS global scope across 67 files, no module bundler. See copilot-instructions.md Section 3." |
+| Tool                 | Rule / Pattern                                                                       | Classification                                                                    | Reply                                                                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codacy               | `localStorage.getItem/setItem` → "use loadData()/saveData()"                         | False positive (scalar string preferences)                                        | "False positive — loadData() is async and JSON-serializes values — incorrect for a plain scalar string preference."                                                          |
+| CodeQL               | `js/clear-text-storage-of-sensitive-data` on `apiKey`/`access_token` in localStorage | False positive (user-owned credentials, single-user local app, no server secrets) | "False positive — StakTrakr stores user-entered credentials on the user's own device. No server secrets. Accepted risk per project security model."                          |
+| CodeQL / GH Security | Format string injection on `console.error(\`...\`, err)`                             | False positive (JS console doesn't do printf substitution)                        | "False positive — Node.js console.error does not perform %s/%d format substitution. Template literal produces a plain string argument, no injection surface."                |
+| Codacy               | Duplication delta on `js/diff-modal.js` type-dispatch renderers                      | Deferred                                                                          | "Deferred to STAK-458 — structural byproduct of type-dispatch renderer pattern. Tracked for refactor."                                                                       |
+| Copilot              | `document.getElementById` in `about.js` / `init.js`                                  | False positive                                                                    | "False positive — startup code in about.js/init.js operates on elements guaranteed to exist at DOM-ready. safeGetElement() exception documented in copilot-instructions.md." |
+| Copilot              | "undefined variable" for any global                                                  | False positive                                                                    | "False positive — vanilla JS global scope across 67 files, no module bundler. See copilot-instructions.md Section 3."                                                        |
 
 ### Present classification table (cluster-aware)
 
@@ -140,6 +140,7 @@ Wait for user confirmation. **After approval, immediately proceed to Phase 3.**
 Fires when PR author is `app/jules-app` or title has Jules prefix.
 
 For any "Won't fix" / "False positive" / "Acknowledged" item:
+
 1. Read `.github/jules-suppressions.json`
 2. Add suppression entry with pattern, reason, date
 3. Generate prompt exclusion clause
@@ -238,6 +239,7 @@ gh api graphql -f query='
 ```
 
 Reply formats:
+
 - **Resolved:** `**Resolved in** \`<SHA>\` — <what changed>`
 - **Fixed:** `**Fixed in** \`<SHA>\` — <what changed>`
 - **Deferred:** `**Deferred to future patch** — <acknowledgment>. Tracked as [ISSUE](link).`
@@ -300,16 +302,19 @@ When automated reviewers (Codacy, Copilot) re-run after a push, they often regen
 **Immediately classify every unresolved thread before taking any action:**
 
 **Duplicate** — ALL of:
+
 1. Author is `codacy-production[bot]`, `copilot[bot]`, or `github-advanced-security[bot]`
 2. `(path, line)` matches a thread already resolved in Phase 3 or an earlier Phase 4 cycle
 3. Comment body is substantially similar to the previously resolved thread
 
 **Net-new** — any of:
+
 - Different `path:line` from all resolved pairs
 - Human reviewer author
 - Substantially different comment body (new concern, not a re-post)
 
 **For each duplicate — resolve inline (no subagent, no new push):**
+
 1. Reply: `**Duplicate — already resolved in this review cycle.** See earlier thread on same file/line.`
 2. Batch-resolve via bash for-loop:
 

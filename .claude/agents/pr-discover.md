@@ -1,6 +1,6 @@
 ---
 name: pr-discover
-description: "PR discovery and pre-analysis agent. Gathers all PR review threads, Codacy findings, runs code review subagents, and returns a structured findings report with file-based thread clusters. Dispatched by /pr-resolve to isolate the heavy data-gathering phases from main context."
+description: 'PR discovery and pre-analysis agent. Gathers all PR review threads, Codacy findings, runs code review subagents, and returns a structured findings report with file-based thread clusters. Dispatched by /pr-resolve to isolate the heavy data-gathering phases from main context.'
 model: sonnet
 library-version: 7715fae9935f
 ---
@@ -13,6 +13,7 @@ You run in isolation to keep the raw API responses, diffs, and Codacy reports ou
 ## Inputs
 
 You will receive:
+
 - `prNumber`: the PR number
 - `owner`: GitHub owner (e.g., "lbruton")
 - `repo`: GitHub repo name (e.g., "StakTrakr")
@@ -22,6 +23,7 @@ You will receive:
 ## Phase 0: Pre-Analysis
 
 ### Get the PR diff
+
 ```bash
 cd <workingDir>
 git diff origin/<baseBranch>...HEAD
@@ -30,6 +32,7 @@ git diff origin/<baseBranch>...HEAD
 ### Analyze the diff for issues
 
 Read through the diff carefully and identify:
+
 1. **Bugs and logic errors** — unchecked return values, off-by-one, race conditions
 2. **Silent failures** — swallowed catches, inappropriate fallbacks, errors logged but not propagated
 3. **Security issues** — innerHTML without sanitization, raw localStorage on user content, XSS vectors
@@ -144,6 +147,7 @@ Assign each cluster a stable ID: `cluster-<N>` (1-indexed).
 ### Cluster output format
 
 For each cluster, record:
+
 - `clusterId`: stable identifier
 - `files`: list of unique file paths in this cluster
 - `threadCount`: number of threads
