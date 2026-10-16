@@ -1,6 +1,6 @@
 ---
 name: spec-requirements
-description: 'Spec Phase 1 — grill the issue, then draft requirements.md in EARS. Standalone, ISSUE-first. Reads universal conventions + per-project overrides.'
+description: "Spec Phase 1 — grill the issue, then draft requirements.md in EARS. Standalone, ISSUE-first. Reads universal conventions + per-project overrides."
 user-invocable: true
 library-version: 7715fae9935f
 ---
@@ -26,24 +26,24 @@ Read **`.agents/skills/spec/references/conventions.md`** (universal mechanics: f
 1. **Resolve the spec folder** per conventions.md. If none exists, STOP: "no spec found for {ISSUE-ID} — run `/spec new {ISSUE-ID} \"<slug>\"` first." Confirm `requirements.md` is the (scaffolded, near-empty) target; if it already has substantial body, surface that and ask before overwriting.
 
 2. **Grill the issue — proportional to how well-specified it already is.**
-    - Inspect the issue body / "Source Issue" block for an existing **`## Discovery`** brief (from `/discover`).
-    - **No discovery brief, or thin issue** → invoke the **`/grill {ISSUE-ID}`** skill and conduct the full interrogation. Do NOT reimplement interrogation inline — grill owns that domain (it reads `.context/GLOSSARY.md`, challenges terminology, cross-references the live codebase, walks decision dependencies, and emits a Grill Brief).
-    - **Discovery brief already present** → grill is largely done; run a **light** pass only on items the brief left open. Don't re-interrogate resolved questions.
-    - Carry grill's **Grill Brief** (Decisions / Terms / Open Questions) forward as the raw material for the requirements.
+   - Inspect the issue body / "Source Issue" block for an existing **`## Discovery`** brief (from `/discover`).
+   - **No discovery brief, or thin issue** → invoke the **`/grill {ISSUE-ID}`** skill and conduct the full interrogation. Do NOT reimplement interrogation inline — grill owns that domain (it reads `.context/GLOSSARY.md`, challenges terminology, cross-references the live codebase, walks decision dependencies, and emits a Grill Brief).
+   - **Discovery brief already present** → grill is largely done; run a **light** pass only on items the brief left open. Don't re-interrogate resolved questions.
+   - Carry grill's **Grill Brief** (Decisions / Terms / Open Questions) forward as the raw material for the requirements.
 
 3. **Draft `requirements.md`** from the brief, per the template:
-    - **User stories** (context — the _who/why_): `As a … I want … so that …`
-    - **Acceptance criteria in EARS** (the testable normative statements — replaces loose Given/When/Then). Pick the right pattern per requirement:
-      | Pattern | Template |
-      |---------|----------|
-      | Ubiquitous | The `<system>` **SHALL** `<response>` |
-      | Event-driven | **WHEN** `<trigger>`, the `<system>` **SHALL** `<response>` |
-      | State-driven | **WHILE** `<state>`, the `<system>` **SHALL** `<response>` |
-      | Unwanted | **IF** `<condition>`, **THEN** the `<system>` **SHALL** `<response>` |
-      | Optional | **WHERE** `<feature>`, the `<system>` **SHALL** `<response>` |
-      Each EARS line must be individually testable — it becomes a TDD Cohort B assertion downstream.
-    - Explicit **non-goals**.
-    - Keep scope tight — specs carry no NFR matrix, stakeholder analysis, or risk register. If the work needs that depth, surface it and stop.
+   - **User stories** (context — the *who/why*): `As a … I want … so that …`
+   - **Acceptance criteria in EARS** (the testable normative statements — replaces loose Given/When/Then). Pick the right pattern per requirement:
+     | Pattern | Template |
+     |---------|----------|
+     | Ubiquitous | The `<system>` **SHALL** `<response>` |
+     | Event-driven | **WHEN** `<trigger>`, the `<system>` **SHALL** `<response>` |
+     | State-driven | **WHILE** `<state>`, the `<system>` **SHALL** `<response>` |
+     | Unwanted | **IF** `<condition>`, **THEN** the `<system>` **SHALL** `<response>` |
+     | Optional | **WHERE** `<feature>`, the `<system>` **SHALL** `<response>` |
+     Each EARS line must be individually testable — it becomes a TDD Cohort B assertion downstream.
+   - Explicit **non-goals**.
+   - Keep scope tight — specs carry no NFR matrix, stakeholder analysis, or risk register. If the work needs that depth, surface it and stop.
 
 4. **Save `requirements.md`.** Touch no other file. (Grill may have updated `.context/GLOSSARY.md` — that's expected and good.)
 

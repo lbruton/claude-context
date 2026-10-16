@@ -8,3 +8,10 @@ repos/
 
 # In-repo Obsidian vault (DEVS-78) — own conventions; linted by docvault-lint
 DocVault/
+
+# skills-deploy managed copies (edit the master in Devops/skill-library, not these)
+.claude/skills/
+.claude/agents/
+.claude/rules/
+.agents/
+.codex/

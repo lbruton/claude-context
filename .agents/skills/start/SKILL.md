@@ -1,12 +1,12 @@
 ---
 name: start
 description: >
-    Lightweight session reorientation — queries sessionflow + mem0 for recent session
-    context, checks git state and active work (worktrees, stashes, open PRs, recent remote
-    branches, version-lock claims), and surfaces the 5 most recent open issues. Use it
-    for continuing same-day work or resuming after a short break.
-    No indexing, no code search, no agent dispatch.
-    Triggers: "start", "quick start", "resume", "orient me", "where were we".
+  Lightweight session reorientation — queries sessionflow + mem0 for recent session
+  context, checks git state and active work (worktrees, stashes, open PRs, recent remote
+  branches, version-lock claims), and surfaces the 5 most recent open issues. Use it
+  for continuing same-day work or resuming after a short break.
+  No indexing, no code search, no agent dispatch.
+  Triggers: "start", "quick start", "resume", "orient me", "where were we".
 library-version: 7715fae9935f
 ---
 
@@ -109,7 +109,7 @@ mcp__plane__workitem(action: "list", project_id: "<uuid>", expand: "state",
 ```
 
 > **Plane Community Edition limits (verified 2026-10-10):** `pql` is rejected (`"PQL and
-structured filters are not supported on this Plane edition"`, returned as a payload,
+> structured filters are not supported on this Plane edition"`, returned as a payload,
 > not an error) and `action: "count"` returns HTTP 404 — filter client-side. `order_by`
 > and the `fields` sparse fieldset DO work and cut the payload sharply; `fields` uses
 > `state`, not `state_id`. Always pass `project_id` and `expand: "state"` (without it,
@@ -275,13 +275,14 @@ search_memories(
 
 > **Quota:** mem0 allows 1,000 retrieval calls per month across every harness. On a
 > 429 / "quota exceeded", don't retry — print `⚠ mem0 read quota exhausted — context
-from sessionflow only` and continue.
+> from sessionflow only` and continue.
 
 Merge with sessionflow findings — mem0 adds `/wrap` session summaries, decisions and handoffs.
 
 **Degradation:** If sessionflow unreachable, use mem0 only + warn:
 `⚠ sessionflow unavailable — context from mem0 only`.
 If both unavailable, note it and continue.
+
 
 ## Output Format
 

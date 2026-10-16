@@ -1,27 +1,26 @@
 ---
 name: context-drift
 description: >-
-    Audit a project's in-repo `.context/` foundation docs against source-code truth, and surface
-    promotion candidates — recurring patterns/decisions that belong in `.context/` + CLAUDE.md but
-    aren't captured yet. Runs claude-context queries against the factual claims in each `.context/`
-    doc (infrastructure.md, architecture.md, coding-standards.md, design-philosophy.md,
-    reusable-patterns.md, plus any project extras) and flags mismatches. Report-only by default;
-    fixes are user-gated and land via worktree + PR (the repo's branch policy). Supersedes
-    `/vault-drift` for projects migrated to `.context/` (DEVS-37). Triggers: "context drift", "vault drift", "drift audit", "drift check",
-    "context-drift", "audit .context", "check context docs", "foundation drift", "verify foundation",
-    "what should be in .context".
+  Audit a project's in-repo `.context/` foundation docs against source-code truth, and surface
+  promotion candidates — recurring patterns/decisions that belong in `.context/` + CLAUDE.md but
+  aren't captured yet. Runs claude-context queries against the factual claims in each `.context/`
+  doc (infrastructure.md, architecture.md, coding-standards.md, design-philosophy.md,
+  reusable-patterns.md, plus any project extras) and flags mismatches. Report-only by default;
+  fixes are user-gated and land via worktree + PR (the repo's branch policy). Supersedes
+  `/vault-drift` for projects migrated to `.context/` (DEVS-37). Triggers: "context drift", "vault drift", "drift audit", "drift check",
+  "context-drift", "audit .context", "check context docs", "foundation drift", "verify foundation",
+  "what should be in .context".
 library-version: 7715fae9935f
 ---
 
 # Context Drift
 
 Audits a project's in-repo **`.context/`** foundation docs against source-code truth, and proposes
-what _should_ be captured but isn't. This is the maintenance counterpart to
+what *should* be captured but isn't. This is the maintenance counterpart to
 `/setup-foundation-context` (which does the one-time migration). Once a project's foundation docs
 live in `.context/`, this skill — not `/vault-drift` — keeps them honest.
 
 Two jobs:
-
 1. **Drift audit** — every factual claim in `.context/` verified against code. Source wins.
 2. **Promotion candidates** — recurring patterns, gotchas, and decisions present in the code or
    recent work but missing from `.context/` / CLAUDE.md. Surfaced as suggestions, never auto-added.
@@ -123,7 +122,7 @@ Run with `run_in_background: true` for large projects; await for small ones.
 
 ## Phase 3b: Promotion-candidate scan (skip if `--no-promote`)
 
-Separate, lighter pass — what _should_ be in `.context/` but isn't. Sources of signal:
+Separate, lighter pass — what *should* be in `.context/` but isn't. Sources of signal:
 
 - **Code reality not documented** — a `lib/` module, a shared helper, a config constant, an env
   var, a hook, or a CI gate that no `.context/` doc mentions. Query CC / Grep for high-fan-in
@@ -135,8 +134,8 @@ Separate, lighter pass — what _should_ be in `.context/` but isn't. Sources of
 - **Stub gaps** — any unpopulated stub section from Phase 1 is a promotion target: propose content
   derived from code.
 
-Output each candidate as: _what_ (the fact), _where it should live_ (`.context/<doc>` section, and
-whether CLAUDE.md should point at it), _evidence_ (file:line / session ref). **Suggestions only** —
+Output each candidate as: *what* (the fact), *where it should live* (`.context/<doc>` section, and
+whether CLAUDE.md should point at it), *evidence* (file:line / session ref). **Suggestions only** —
 never auto-write.
 
 ## Phase 4: Write the report
@@ -149,11 +148,11 @@ $(vault-path private)/drift-reports/{YYYY-MM-DD}-context.md
 
 ```yaml
 ---
-title: '{project} Context Drift Report — {YYYY-MM-DD}'
+title: "{project} Context Drift Report — {YYYY-MM-DD}"
 type: audit
-project: { project }
-created: '{YYYY-MM-DD}'
-tags: [drift, audit, context, { project }]
+project: {project}
+created: "{YYYY-MM-DD}"
+tags: [drift, audit, context, {project}]
 ---
 ```
 

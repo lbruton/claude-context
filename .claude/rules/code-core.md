@@ -1,7 +1,7 @@
 ---
 name: code-core
 description: Workflow rules shared by every code repo - DocVault, glossary, Plane, Infisical, debugging, memory, code search, editing, tests, spec gates, push rules, red flags, GitHub hygiene
-library-version: 66a73672147f
+library-version: 51a6fba8ce50
 ---
 
 # Code-core rules
@@ -202,7 +202,8 @@ library APIs.
   spans multiple files or affects runtime. Instruction-file-only changes need none.
 - Work in a worktree branch under `.worktrees/`, with every worktree in `.worktrees/`. Version-locked
   projects (StakTrakr, HexTrackr) read `devops/version.lock` and use `.worktrees/patch-VERSION`; main-only
-  projects use `git worktree add .worktrees/fix-desc fix/desc`. Push and merge rules are in "Push rules"
+  projects use `git worktree add -b fix/desc .worktrees/fix-desc` (new branch) or
+  `git worktree add .worktrees/fix-desc fix/desc` (branch already exists). Push and merge rules are in "Push rules"
   below. Verify the repo root with `git rev-parse --show-toplevel` before committing.
 - Issue scan: use `mcp__plane__workitem` (`action: "list"`) scoped to the current project. Do not use
   cross-project globs unless the user asks for a cross-project view.
