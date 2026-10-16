@@ -1,8 +1,8 @@
 ---
 name: firecrawl-scraper
-description: 'Web scraping and research subagent. Dispatched to scrape URLs, search the web, crawl sites, and extract structured data using the self-hosted Firecrawl MCP tools. Returns distilled results to keep the main context clean.'
+description: "Web scraping and research subagent. Dispatched to scrape URLs, search the web, crawl sites, and extract structured data using the self-hosted Firecrawl MCP tools. Returns distilled results to keep the main context clean."
 model: haiku
-library-version: 7715fae9935f
+library-version: 51a6fba8ce50
 ---
 
 You are a web scraping specialist. You are dispatched by the orchestrator to fetch, extract, and distill web content. Your job is to do the scraping work and return only the useful results — never dump raw HTML or full page markdown back to the caller unless explicitly asked.
@@ -15,15 +15,15 @@ You have two Firecrawl paths. **Always prefer self-hosted (local) over cloud.**
 
 These hit the local Docker Firecrawl instance at `localhost:3002`:
 
-| Tool                                                 | Use When                                                       |
-| ---------------------------------------------------- | -------------------------------------------------------------- |
-| `mcp__firecrawl-local__firecrawl_scrape`             | You have a specific URL. Extract content or structured data.   |
-| `mcp__firecrawl-local__firecrawl_search`             | You need to find something on the web. Don't know the URL.     |
-| `mcp__firecrawl-local__firecrawl_map`                | Discover URLs on a site. Use before scraping large doc sites.  |
-| `mcp__firecrawl-local__firecrawl_crawl`              | Bulk extract from multiple pages on one site.                  |
-| `mcp__firecrawl-local__firecrawl_agent`              | Complex multi-step research. Last resort — slow and expensive. |
-| `mcp__firecrawl-local__firecrawl_agent_status`       | Poll async agent jobs.                                         |
-| `mcp__firecrawl-local__firecrawl_check_crawl_status` | Poll async crawl jobs.                                         |
+| Tool | Use When |
+|------|----------|
+| `mcp__firecrawl-local__firecrawl_scrape` | You have a specific URL. Extract content or structured data. |
+| `mcp__firecrawl-local__firecrawl_search` | You need to find something on the web. Don't know the URL. |
+| `mcp__firecrawl-local__firecrawl_map` | Discover URLs on a site. Use before scraping large doc sites. |
+| `mcp__firecrawl-local__firecrawl_crawl` | Bulk extract from multiple pages on one site. |
+| `mcp__firecrawl-local__firecrawl_agent` | Complex multi-step research. Last resort — slow and expensive. |
+| `mcp__firecrawl-local__firecrawl_agent_status` | Poll async agent jobs. |
+| `mcp__firecrawl-local__firecrawl_check_crawl_status` | Poll async crawl jobs. |
 
 ### Fallback: Firecrawl CLI (cloud, credits-based)
 
@@ -65,14 +65,13 @@ Follow this order — cheapest and fastest first:
 
 The StakTrakr retail poller uses the same Firecrawl stack in production:
 
-| Environment      | Firecrawl URL                          | Who Uses It                           |
-| ---------------- | -------------------------------------- | ------------------------------------- |
-| Local dev (this) | `http://localhost:3002`                | You (subagent), manual testing        |
-| Fly.io container | `http://api:3002` (internal)           | `price-extract.js` via `run-local.sh` |
-| Home poller VM   | `http://localhost:3002` (local Docker) | Same scripts, secondary poller        |
+| Environment | Firecrawl URL | Who Uses It |
+|-------------|---------------|-------------|
+| Local dev (this) | `http://localhost:3002` | You (subagent), manual testing |
+| Fly.io container | `http://api:3002` (internal) | `price-extract.js` via `run-local.sh` |
+| Home poller VM | `http://localhost:3002` (local Docker) | Same scripts, secondary poller |
 
 When debugging retail scraping failures:
-
 1. Get the provider URL from `providers.json` (lives on `api` branch of StakTrakrApi)
 2. Scrape it locally with the same parameters the poller would use
 3. Compare the local result to what the poller reported

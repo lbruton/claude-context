@@ -2,47 +2,47 @@
 name: spec
 description: "Phased spec workflow above a quick fix. Driver for the /spec-* phase family + execution engines (run/workflow/dispatch). Phased markdown artifacts in the repo's specs root (specs.path in .claude/project.json, default DocVault/specs/)."
 user-invocable: true
-library-version: 7715fae9935f
+library-version: 51a6fba8ce50
 ---
 
 # Spec — Phased Spec Workflow (driver)
 
 Markdown-first, agent-agnostic workflow for anything bigger than a quick fix. Target window: **30–90 minutes**; larger or high-risk work uses the same phases with mandatory per-phase review.
 
-This skill is the **lifecycle driver**. The four authoring phases and the review/reconcile steps are now **standalone, ISSUE-first skills** (see _Command family_ below). The driver owns scaffolding (`new`), the three execution engines (`run` / `workflow` / `dispatch`), and lifecycle ops (`archive`).
+This skill is the **lifecycle driver**. The four authoring phases and the review/reconcile steps are now **standalone, ISSUE-first skills** (see *Command family* below). The driver owns scaffolding (`new`), the three execution engines (`run` / `workflow` / `dispatch`), and lifecycle ops (`archive`).
 
 > **Read `.agents/skills/spec/references/conventions.md` first** — it is the single source of truth for command grammar, folder resolution, the four artifacts, phase-boundary discipline, the unreconciled-marks pre-check, reviewer tags, and the `approved:` rule. The per-project `.context/spec-conventions.md` carries worktree/branch/closing-task overrides. This driver does not restate them.
 
 ## When to use which tier
 
-| Tier                                         | Use when                                                                                                                      | Time      |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Quick fix (no skill: worktree + `chore:` PR) | 1–3 files, trivial fix/CSS/syntax                                                                                             | <30 min   |
-| `/spec`                                      | 3–15 files, multi-step refactor/feature, multi-model collab valuable                                                          | 30–90 min |
-| `/spec` + mandatory review                   | Cross-cutting, public API, schema/data migration, security-sensitive — run `/spec-review` (≥1 other model) on **every** phase | 1–6 h     |
+| Tier | Use when | Time |
+|------|----------|------|
+| Quick fix (no skill: worktree + `chore:` PR) | 1–3 files, trivial fix/CSS/syntax | <30 min |
+| `/spec` | 3–15 files, multi-step refactor/feature, multi-model collab valuable | 30–90 min |
+| `/spec` + mandatory review | Cross-cutting, public API, schema/data migration, security-sensitive — run `/spec-review` (≥1 other model) on **every** phase | 1–6 h |
 
 ## Command family
 
 **Phase / process skills** — ISSUE always first (standalone skills, not subcommands):
 
-| Skill                              | Phase                                     |
-| ---------------------------------- | ----------------------------------------- |
-| `/spec-requirements ISSUE`         | 1 — grill + EARS requirements.md          |
-| `/spec-discovery ISSUE`            | 2 — research sweep → discovery.md         |
-| `/spec-approach ISSUE`             | 3 — architecture + file map → approach.md |
-| `/spec-tasks ISSUE`                | 4 — TDD sprint cohorts → tasks.md         |
-| `/spec-review ISSUE PHASE [AGENT]` | peer review of one phase                  |
-| `/spec-reconcile ISSUE PHASE`      | apply review marks, archive originals     |
+| Skill | Phase |
+|-------|-------|
+| `/spec-requirements ISSUE` | 1 — grill + EARS requirements.md |
+| `/spec-discovery ISSUE` | 2 — research sweep → discovery.md |
+| `/spec-approach ISSUE` | 3 — architecture + file map → approach.md |
+| `/spec-tasks ISSUE` | 4 — TDD sprint cohorts → tasks.md |
+| `/spec-review ISSUE PHASE [AGENT]` | peer review of one phase |
+| `/spec-reconcile ISSUE PHASE` | apply review marks, archive originals |
 
 **Lifecycle driver** — `/spec <verb> ISSUE`:
 
-| Verb                      | Action                                                                                                                                                   |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `new <ISSUE-ID> "<slug>"` | Scaffold the spec folder + 4 empty artifacts from templates.                                                                                             |
-| `run <ISSUE-ID>`          | **HARD GATE**, then execute tasks.md **inline**, one task at a time.                                                                                     |
-| `workflow <ISSUE-ID>`     | **HARD GATE**, then **in-harness subagent** conductor — `[P]` tasks run in true parallel via the Task tool.                                              |
-| `dispatch <ISSUE-ID>`     | **HARD GATE**, then print self-contained prompt blocks to **hand off to an external terminal** (Codex / OpenCode / Antigravity / second Claude session). |
-| `archive <ISSUE-ID>`      | Move folder to `archive/`, log mem0, mark issue Done.                                                                                                    |
+| Verb | Action |
+|------|--------|
+| `new <ISSUE-ID> "<slug>"` | Scaffold the spec folder + 4 empty artifacts from templates. |
+| `run <ISSUE-ID>` | **HARD GATE**, then execute tasks.md **inline**, one task at a time. |
+| `workflow <ISSUE-ID>` | **HARD GATE**, then **in-harness subagent** conductor — `[P]` tasks run in true parallel via the Task tool. |
+| `dispatch <ISSUE-ID>` | **HARD GATE**, then print self-contained prompt blocks to **hand off to an external terminal** (Codex / OpenCode / Antigravity / second Claude session). |
+| `archive <ISSUE-ID>` | Move folder to `archive/`, log mem0, mark issue Done. |
 
 > **Verb history (the `dispatch` flip):** the old subcommands were `apply`/`dispatch`/`orchestrate`. Mapping: `apply→run`, `dispatch→workflow`, `orchestrate→dispatch`. **The word `dispatch` changed meaning** — it now means external-terminal handoff, not in-harness subagents.
 
@@ -111,7 +111,6 @@ Use this only when the user explicitly invoked `/spec workflow` or otherwise ask
 **PARALLELIZATION SAFETY — re-verify before dispatch.** A `[P]` marker is a promise from the tasks author; re-check it: do any two `[P]` tasks share a `File(s):` path? does one depend on a symbol another creates? If yes, force them serial. This re-check is cheap and catches authoring drift.
 
 **Dispatch loop.** Per cohort: send the parallel batch in one message, await all; then run the serial queue one at a time. **After each task** — verify before marking `[x]`:
-
 - `cd {worktree_path} && git log --oneline origin/{base}..HEAD` — confirm a new commit landed.
 - `git show <SHA>` / `git diff HEAD~1` — confirm file scope matches the task's declared `File(s):`. If the diff touches files outside that scope, STOP and surface the drift — do not mark `[x]`.
 
