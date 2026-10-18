@@ -1,7 +1,7 @@
 ---
 name: release
 description: Release workflow — version lock, worktree, bump, commit, PR, GitHub Release. Delegates to project overrides.
-library-version: 5834a2dcd445
+library-version: c1f149d0652e
 ---
 
 # Release — Universal Version Lock Workflow
@@ -268,12 +268,19 @@ git push origin patch/VERSION
 
 Create the PR targeting the appropriate branch.
 
-**Review labels (patch/release PRs):** apply BOTH `codacy-review` AND `coderabbit-review` —
-both reviewers are label-gated and a patch gets both. Only small chore PRs (config/tooling,
-no runtime code) omit both labels and rely on the Copilot/Codex auto-reviews alone.
+**Reviews (patch/release PRs):** apply the `codacy-review` label AND request a CodeRabbit
+review with a `@coderabbitai review` PR comment. Small chore PRs (config/tooling, no runtime
+code) skip both and rely on the Copilot/Codex auto-reviews alone.
+
+CodeRabbit is **comment-triggered, not label-triggered** (2026-10-17). On the free OSS plan it
+skips every PR it was not asked to review ("fewer than 10 stars" / "manual review required"),
+the `coderabbit-review` label included, and its required `CodeRabbit` check still **passes**.
+A green check is therefore not evidence of a review. Post the trigger once the PR is out of
+draft (`gh pr ready` first if it opened as a draft), and post it again after any follow-up
+push you want reviewed.
 
 ```bash
-gh pr create --base $TARGET_BRANCH --head patch/VERSION --draft --label "codacy-review" --label "coderabbit-review" \
+gh pr create --base $TARGET_BRANCH --head patch/VERSION --draft --label "codacy-review" \
   --title "vNEW_VERSION — [brief description]" \
   --body "$(cat <<'EOF'
 > **Draft — QA preview.** Merge to `$TARGET_BRANCH` after review.
@@ -291,7 +298,8 @@ EOF
 
 ### Step 2: PR Resolution (MANDATORY)
 
-1. Wait for CI/Codacy scans to start
+1. Once the PR is out of draft, request the CodeRabbit review:
+   `gh pr comment <number> --body "@coderabbitai review"`, then wait for CI/Codacy scans to start
 2. Run `/pr-resolve` to monitor and resolve review threads
 3. Confirm the PR is clean — all checks passing, no unresolved threads
 
@@ -318,7 +326,7 @@ Read each referenced issue from Plane (`mcp__plane__workitem` (`action: "retriev
 ### Step 3: Create `dev → main` PR
 
 ```bash
-gh pr create --base main --head dev --label "codacy-review" --label "coderabbit-review" \
+gh pr create --base main --head dev --label "codacy-review" \
   --title "vLATEST_VERSION — [comprehensive title]" \
   --body "$(cat <<'EOF'
 ## Summary
@@ -342,6 +350,7 @@ follow them here.
 
 ```bash
 gh pr ready [number]
+gh pr comment [number] --body "@coderabbitai review"
 ```
 
 Run `/pr-resolve` to clear all threads.
